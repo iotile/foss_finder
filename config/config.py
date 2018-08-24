@@ -1,10 +1,10 @@
-import strings
+from .strings import * 
 
 # Fields of the CSV file (ordered)
 FIELDS = [
-    strings.REGISTRY,
-    strings.PACKAGE,
-    strings.LICENSE,
-    strings.VERSION,
-    strings.URL,
+    REGISTRY,
+    PACKAGE,
+    LICENSE,
+    VERSION,
+    URL,
 ]
