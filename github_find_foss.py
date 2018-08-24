@@ -18,7 +18,7 @@ def get_dir_content(repo, path):
     print('+++++ {}'.format(path))
     files = repo.get_dir_contents(path)
     for file in files:
-        if os.path.basename(file.name) in ['package.json']:
+        if os.path.basename(file.name) in ['package.json', 'bower.json']:
             full_path_name = os.path.join(path, file.name)
             print('--> {} ({})'.format(full_path_name, file.type))
             file_content = repo.get_file_contents(full_path_name)
@@ -50,24 +50,6 @@ def get_dir_content(repo, path):
                 if strings.ERROR not in info:
                     write_new_row(repo.name + '.csv', [info.get(f) for f in config.FIELDS])
 
-        if os.path.basename(file.name) in ['bower.json']:
-            full_path_name = os.path.join(path, file.name)
-            print('--> {} ({})'.format(full_path_name, file.type))
-            file_content = repo.get_file_contents(full_path_name)
-            decoded_file = base64.b64decode(file_content.content)
-
-            obj = json.loads(decoded_file)
-            for section in ['devDependencies', 'dependencies']:
-                if section in obj:
-                    for name in obj[section].keys():
-                        version = obj[section][name]
-                        print('----> {}: {}'.format(name, version))
-                        info = NpmPackageParser.get_package_info(name.lower(), version)
-                        print('----> {}'.format(info))
-                        if strings.ERROR not in info:
-                            write_new_row(repo.name + '.csv', [info.get(f) for f in config.FIELDS])
-
-
         if str(file.type) == 'dir':
             get_dir_content(repo, os.path.join(path, file.name))
 
@@ -98,11 +80,7 @@ if __name__ == '__main__':
 
     g = Github(access_token)
 
-    index = 0
-    for repo in g.get_organization(args.org).get_repos():
-
-
-        index += 1
+    for index, repo in enumerate(g.get_organization(args.org).get_repos()):
         if repo.name == 'archway':
             print('{}: {}'.format(index, repo.name))
             write_new_row(repo.name + '.csv', config.FIELDS)

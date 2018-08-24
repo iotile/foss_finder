@@ -10,14 +10,12 @@ class NpmPackageParser(object):
     @classmethod
     def get_package_info(cls, name, version=None):
         if version:
-            # for char_to_remove in '~^=<>':
-            #     version = version.replace(char_to_remove, '')
             version = NpmPackageParser.parse_version(version)
 
         url = 'https://registry.npmjs.org/{}/latest/'.format(name)
         #if version:
         #    url += '{}/'.format(version)
-        print(url)
+
         resp = requests.get(url)
         info = {
             strings.REGISTRY: 'NPM',
@@ -43,19 +41,15 @@ class NpmPackageParser(object):
 
     @classmethod
     def parse_version(cls, version):
-        regex = r"(?P<spec>[=<>~^]*)(?P<ver>[.0-9]*)"
+        regex = r"(?P<spec>[=<>~^]*)(?P<ver>[.a-zA-Z0-9_-]*)"
         parts = re.match(regex, version)
         if parts:
             spec = parts.group('spec').strip()
             ver = parts.group('ver')
-            version = None
+            version = ver
             if spec and ver:
-                if spec in ['=', '<=', '<', '~', '^']:
-                    version = ver
-            if ver and not spec:
-                version = ver
+                if spec in ['>=', '>']:
+                    version = None
 
             return version
-        return {
-            'error': 'Parsing error'
-        }
+        raise ValueError

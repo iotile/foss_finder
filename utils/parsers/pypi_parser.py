@@ -43,11 +43,9 @@ class PyPiRequirementParser(object):
             ver = parts.group('ver')
             version = None
             if spec and ver:
-                if spec in ['==', '<=']:
+                if spec not in ['>=', '>']:
                     version = ver
 
             info = PyPiRequirementParser.get_package_info(name, version)
             return info
-        return {
-            'error': 'Parsing error'
-        }
+        raise ValueError
