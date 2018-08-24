@@ -7,7 +7,9 @@ import argparse
 
 from github import Github
 
-from parsers.npm_parser import NpmPackageParser
+from utils.parsers import NpmPackageParser, PyPiRequirementParser
+from utils.csv import write_new_row
+from config import strings, config
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +23,6 @@ def get_dir_content(repo, path):
             print('--> {} ({})'.format(full_path_name, file.type))
             file_content = repo.get_file_contents(full_path_name)
             decoded_file = base64.b64decode(file_content.content)
-            # print(decoded_file)
 
             obj = json.loads(decoded_file)
             for section in ['devDependencies', 'dependencies', 'engines']:
@@ -29,12 +30,46 @@ def get_dir_content(repo, path):
                     for name in obj[section].keys():
                         version = obj[section][name]
                         print('----> {}: {}'.format(name, version))
-                        info = NpmPackageParser.get_package_info(name, version)
+                        info = NpmPackageParser.get_package_info(name.lower(), version)
                         print('----> {}'.format(info))
+                        if strings.ERROR not in info:
+                            write_new_row(repo.name + '.csv', [info.get(f) for f in config.FIELDS])
+
+
+        if os.path.basename(file.name) in ['requirements.txt', 'base.txt', 'development.txt', 'docker.txt', 'production.txt']:
+            full_path_name = os.path.join(path, file.name)
+            print('--> {} ({})'.format(full_path_name, file.type))
+            file_content = repo.get_file_contents(full_path_name)
+            decoded_file = base64.b64decode(file_content.content).decode('utf-8')
+            lines = [line for line in decoded_file.split('\n') if line and line[0] != '#']
+
+            for line in lines:
+                print('----> {}'.format(line))
+                info = PyPiRequirementParser.parse_line(line)
+                print('----> {}'.format(info))
+                if strings.ERROR not in info:
+                    write_new_row(repo.name + '.csv', [info.get(f) for f in config.FIELDS])
+
+        if os.path.basename(file.name) in ['bower.json']:
+            full_path_name = os.path.join(path, file.name)
+            print('--> {} ({})'.format(full_path_name, file.type))
+            file_content = repo.get_file_contents(full_path_name)
+            decoded_file = base64.b64decode(file_content.content)
+
+            obj = json.loads(decoded_file)
+            for section in ['devDependencies', 'dependencies']:
+                if section in obj:
+                    for name in obj[section].keys():
+                        version = obj[section][name]
+                        print('----> {}: {}'.format(name, version))
+                        info = NpmPackageParser.get_package_info(name.lower(), version)
+                        print('----> {}'.format(info))
+                        if strings.ERROR not in info:
+                            write_new_row(repo.name + '.csv', [info.get(f) for f in config.FIELDS])
+
 
         if str(file.type) == 'dir':
             get_dir_content(repo, os.path.join(path, file.name))
-
 
 # Then play with your Github objects:
 
@@ -65,12 +100,11 @@ if __name__ == '__main__':
 
     index = 0
     for repo in g.get_organization(args.org).get_repos():
-        print('{}: {}'.format(index, repo.name))
 
-        get_dir_content(repo, '/')
 
         index += 1
-        sys.exit()
-
-
-
+        if repo.name == 'archway':
+            print('{}: {}'.format(index, repo.name))
+            write_new_row(repo.name + '.csv', config.FIELDS)
+            get_dir_content(repo, '/')
+            sys.exit()
