@@ -5,18 +5,24 @@ import base64
 import logging
 import argparse
 
-from github import Github
+from github import Github, GithubException
 
 from utils.parsers import NpmPackageParser, PyPiRequirementParser
-from utils.csv import write_new_row
+from utils.tracker import FossTracker
 from config import strings, config
 
 logger = logging.getLogger(__name__)
 
 
-def get_dir_content(repo, path, output_path):
+def get_dir_content(repo, path, output_path, tracker):
     logger.debug(f'+++++ {path}')
-    files = repo.get_dir_contents(path)
+    
+    try:
+        files = repo.get_dir_contents(path)
+    # The repository may be empty
+    except GithubException:
+        return None
+
     for file in files:
         if os.path.basename(file.name) in ['package.json', 'bower.json']:
             full_path_name = os.path.join(path, file.name)
@@ -33,8 +39,7 @@ def get_dir_content(repo, path, output_path):
                         info = NpmPackageParser.get_package_info(name.lower(), version)
                         logger.debug(f'Info: {info}')
                         if strings.ERROR not in info:
-                            write_new_row(output_path, [info.get(f) for f in config.FIELDS])
-
+                            tracker.add_foss_to_project(repo.name, [info.get(f) for f in config.FIELDS])
 
         if os.path.basename(file.name) in ['requirements.txt', 'base.txt', 'development.txt', 'docker.txt', 'production.txt']:
             full_path_name = os.path.join(path, file.name)
@@ -48,10 +53,18 @@ def get_dir_content(repo, path, output_path):
                 info = PyPiRequirementParser.parse_line(line)
                 logger.debug(f'Info: {info}')
                 if strings.ERROR not in info:
-                    write_new_row(output_path, [info.get(f) for f in config.FIELDS])
+                    tracker.add_foss_to_project(repo.name, [info.get(f) for f in config.FIELDS])
 
         if str(file.type) == 'dir':
-            get_dir_content(repo, os.path.join(path, file.name), output_path)
+            get_dir_content(repo, os.path.join(path, file.name), output_path, tracker)
+
+
+def process_project(repo, tracker, outdir):
+    output_path = os.path.join(outdir, repo.name + '.csv')
+    os.makedirs(outdir, exist_ok=True)
+    tracker.add_project(repo.name)
+    get_dir_content(repo, '/', output_path, tracker)
+    tracker.write_project_csv(repo.name, config.FIELDS, output_path)
 
 
 if __name__ == '__main__':
@@ -84,19 +97,19 @@ if __name__ == '__main__':
 
     g = Github(access_token)
 
+    tracker = FossTracker()
+
     if args.project:
         repo = g.get_organization(args.org).get_repo(args.project)
         logger.info(f'Starting process for {repo.name}')
-        output_path = os.path.join(args.outdir, repo.name + '.csv')
-        os.makedirs(args.outdir, exist_ok=True)
-        write_new_row(output_path, config.FIELDS)
-        get_dir_content(repo, '/', output_path)
+        process_project(repo, tracker, args.outdir)
         logger.info(f'End of process for {repo.name}')
+        for line in tracker.report_project_summary(repo.name):
+            logger.info(line)
     else:
         for index, repo in enumerate(g.get_organization(args.org).get_repos()):
             logger.info(f'Starting process for {index}: {repo.name}')
-            output_path = os.path.join(args.outdir, repo.name + '.csv')
-            os.makedirs(args.outdir, exist_ok=True)
-            write_new_row(output_path, config.FIELDS)
-            get_dir_content(repo, '/', output_path)
+            process_project(repo, tracker, args.outdir)
             logger.info(f'End of process for {index}: {repo.name}')
+        for line in tracker.report_total_summary():
+            logger.info(line)
