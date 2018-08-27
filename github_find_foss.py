@@ -67,6 +67,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-t', '--token', dest='token', type=str, required=False, help='Github Token')
+    parser.add_argument('--project', type=str, required=False, help='Process a specific repository')
     parser.add_argument('org', metavar='org', type=str, help='GitHub Org')
 
     args = parser.parse_args()
@@ -80,7 +81,14 @@ if __name__ == '__main__':
 
     g = Github(access_token)
 
-    for index, repo in enumerate(g.get_organization(args.org).get_repos()):
-        print('{}: {}'.format(index, repo.name))
+    if args.project:
+        repo = g.get_organization(args.org).get_repo(args.project)
+        logger.info(f'Starting process for {repo.name}')
         write_new_row(repo.name + '.csv', config.FIELDS)
         get_dir_content(repo, '/')
+        logger.info(f'End of process for {repo.name}')
+    else:
+        for index, repo in enumerate(g.get_organization(args.org).get_repos()):
+            print('{}: {}'.format(index, repo.name))
+            write_new_row(repo.name + '.csv', config.FIELDS)
+            get_dir_content(repo, '/')
