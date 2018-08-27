@@ -14,7 +14,7 @@ from config import strings, config
 logger = logging.getLogger(__name__)
 
 
-def get_dir_content(repo, path):
+def get_dir_content(repo, path, output_path):
     logger.debug(f'+++++ {path}')
     files = repo.get_dir_contents(path)
     for file in files:
@@ -65,6 +65,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-t', '--token', dest='token', type=str, required=False, help='Github Token')
     parser.add_argument('-o', '--outdir', dest='outdir', type=str, default='out', help='Output directory')
+    parser.add_argument('--project', type=str, required=False, help='Process a specific repository')
     parser.add_argument('--debug', type=bool, default=False, help='Debug Mode')
     parser.add_argument('org', metavar='org', type=str, help='GitHub Org')
 
@@ -83,10 +84,19 @@ if __name__ == '__main__':
 
     g = Github(access_token)
 
-    for index, repo in enumerate(g.get_organization(args.org).get_repos()):
-        logger.info(f'Starting process for {index}: {repo.name}')
+    if args.project:
+        repo = g.get_organization(args.org).get_repo(args.project)
+        logger.info(f'Starting process for {repo.name}')
         output_path = os.path.join(args.outdir, repo.name + '.csv')
         os.makedirs(args.outdir, exist_ok=True)
         write_new_row(output_path, config.FIELDS)
         get_dir_content(repo, '/', output_path)
-        logger.info(f'End of process for {index}: {repo.name}')
+        logger.info(f'End of process for {repo.name}')
+    else:
+        for index, repo in enumerate(g.get_organization(args.org).get_repos()):
+            logger.info(f'Starting process for {index}: {repo.name}')
+            output_path = os.path.join(args.outdir, repo.name + '.csv')
+            os.makedirs(args.outdir, exist_ok=True)
+            write_new_row(output_path, config.FIELDS)
+            get_dir_content(repo, '/', output_path)
+            logger.info(f'End of process for {index}: {repo.name}')
