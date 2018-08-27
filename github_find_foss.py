@@ -33,7 +33,7 @@ def get_dir_content(repo, path):
                         info = NpmPackageParser.get_package_info(name.lower(), version)
                         logger.debug(f'Info: {info}')
                         if strings.ERROR not in info:
-                            write_new_row(repo.name + '.csv', [info.get(f) for f in config.FIELDS])
+                            write_new_row(output_path, [info.get(f) for f in config.FIELDS])
 
 
         if os.path.basename(file.name) in ['requirements.txt', 'base.txt', 'development.txt', 'docker.txt', 'production.txt']:
@@ -48,10 +48,10 @@ def get_dir_content(repo, path):
                 info = PyPiRequirementParser.parse_line(line)
                 logger.debug(f'Info: {info}')
                 if strings.ERROR not in info:
-                    write_new_row(repo.name + '.csv', [info.get(f) for f in config.FIELDS])
+                    write_new_row(output_path, [info.get(f) for f in config.FIELDS])
 
         if str(file.type) == 'dir':
-            get_dir_content(repo, os.path.join(path, file.name))
+            get_dir_content(repo, os.path.join(path, file.name), output_path)
 
 
 if __name__ == '__main__':
@@ -64,6 +64,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-t', '--token', dest='token', type=str, required=False, help='Github Token')
+    parser.add_argument('-o', '--outdir', dest='outdir', type=str, default='out', help='Output directory')
     parser.add_argument('--debug', type=bool, default=False, help='Debug Mode')
     parser.add_argument('org', metavar='org', type=str, help='GitHub Org')
 
@@ -84,6 +85,8 @@ if __name__ == '__main__':
 
     for index, repo in enumerate(g.get_organization(args.org).get_repos()):
         logger.info(f'Starting process for {index}: {repo.name}')
-        write_new_row(repo.name + '.csv', config.FIELDS)
-        get_dir_content(repo, '/')
+        output_path = os.path.join(args.outdir, repo.name + '.csv')
+        os.makedirs(args.outdir, exist_ok=True)
+        write_new_row(output_path, config.FIELDS)
+        get_dir_content(repo, '/', output_path)
         logger.info(f'End of process for {index}: {repo.name}')
