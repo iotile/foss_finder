@@ -24,7 +24,10 @@ class NpmPackageParser(object):
         if resp.status_code == 200:
             package_info = json.loads(resp.content.decode())
             if 'license' in package_info:
-                info[strings.LICENSE] = package_info['license']
+                if type(package_info['license']) is dict:
+                    info[strings.LICENSE] = package_info['license']['type']
+                else:
+                    info[strings.LICENSE] = package_info['license']
             if 'version' in package_info:
                 info[strings.VERSION] = package_info['version']
             else:

@@ -84,4 +84,3 @@ if __name__ == '__main__':
         print('{}: {}'.format(index, repo.name))
         write_new_row(repo.name + '.csv', config.FIELDS)
         get_dir_content(repo, '/')
-        sys.exit()
