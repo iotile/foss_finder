@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import base64
+import re
 import logging
 import argparse
 
@@ -16,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 def get_dir_content(repo, path, output_path, tracker):
     logger.debug(f'+++++ {path}')
+    python_regex = r".*requirements.*\.txt$"
     
     try:
         files = repo.get_dir_contents(path)
@@ -24,8 +26,8 @@ def get_dir_content(repo, path, output_path, tracker):
         return None
 
     for file in files:
+        full_path_name = os.path.join(path, file.name)
         if os.path.basename(file.name) in ['package.json', 'bower.json']:
-            full_path_name = os.path.join(path, file.name)
             logger.info(f'Found {full_path_name} ({file.type})')
             file_content = repo.get_file_contents(full_path_name)
             decoded_file = base64.b64decode(file_content.content)
@@ -41,8 +43,7 @@ def get_dir_content(repo, path, output_path, tracker):
                         if strings.ERROR not in info:
                             tracker.add_foss_to_project(repo.name, [info.get(f) for f in config.FIELDS])
 
-        if os.path.basename(file.name) in ['requirements.txt', 'base.txt', 'development.txt', 'docker.txt', 'production.txt']:
-            full_path_name = os.path.join(path, file.name)
+        if re.match(python_regex, full_path_name):
             logger.info(f'Found {full_path_name} ({file.type})')
             file_content = repo.get_file_contents(full_path_name)
             decoded_file = base64.b64decode(file_content.content).decode('utf-8')
