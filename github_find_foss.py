@@ -14,7 +14,7 @@ from config import strings, config
 logger = logging.getLogger(__name__)
 
 
-def get_dir_content(repo, path):
+def get_dir_content(repo, path, output_path):
     logger.debug(f'+++++ {path}')
     files = repo.get_dir_contents(path)
     for file in files:
@@ -86,7 +86,7 @@ if __name__ == '__main__':
 
     if args.project:
         repo = g.get_organization(args.org).get_repo(args.project)
-        logger.info(f'Starting process for {repo.name}'
+        logger.info(f'Starting process for {repo.name}')
         output_path = os.path.join(args.outdir, repo.name + '.csv')
         os.makedirs(args.outdir, exist_ok=True)
         write_new_row(output_path, config.FIELDS)
