@@ -81,8 +81,7 @@ if __name__ == '__main__':
     g = Github(access_token)
 
     for index, repo in enumerate(g.get_organization(args.org).get_repos()):
-        if repo.name == 'archway':
-            print('{}: {}'.format(index, repo.name))
-            write_new_row(repo.name + '.csv', config.FIELDS)
-            get_dir_content(repo, '/')
-            sys.exit()
+        print('{}: {}'.format(index, repo.name))
+        write_new_row(repo.name + '.csv', config.FIELDS)
+        get_dir_content(repo, '/')
+        sys.exit()
