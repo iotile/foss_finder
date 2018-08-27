@@ -15,12 +15,12 @@ logger = logging.getLogger(__name__)
 
 
 def get_dir_content(repo, path):
-    print('+++++ {}'.format(path))
+    logger.debug(f'+++++ {path}')
     files = repo.get_dir_contents(path)
     for file in files:
         if os.path.basename(file.name) in ['package.json', 'bower.json']:
             full_path_name = os.path.join(path, file.name)
-            print('--> {} ({})'.format(full_path_name, file.type))
+            logger.info(f'Found {full_path_name} ({file.type})')
             file_content = repo.get_file_contents(full_path_name)
             decoded_file = base64.b64decode(file_content.content)
 
@@ -29,50 +29,52 @@ def get_dir_content(repo, path):
                 if section in obj:
                     for name in obj[section].keys():
                         version = obj[section][name]
-                        print('----> {}: {}'.format(name, version))
+                        logger.debug(f'Processing module {name}: {version}')
                         info = NpmPackageParser.get_package_info(name.lower(), version)
-                        print('----> {}'.format(info))
+                        logger.debug(f'Info: {info}')
                         if strings.ERROR not in info:
                             write_new_row(repo.name + '.csv', [info.get(f) for f in config.FIELDS])
 
 
         if os.path.basename(file.name) in ['requirements.txt', 'base.txt', 'development.txt', 'docker.txt', 'production.txt']:
             full_path_name = os.path.join(path, file.name)
-            print('--> {} ({})'.format(full_path_name, file.type))
+            logger.info(f'Found {full_path_name} ({file.type})')
             file_content = repo.get_file_contents(full_path_name)
             decoded_file = base64.b64decode(file_content.content).decode('utf-8')
             lines = [line for line in decoded_file.split('\n') if line and line[0] != '#']
 
             for line in lines:
-                print('----> {}'.format(line))
+                logger.debug(f'Processing module {line}')
                 info = PyPiRequirementParser.parse_line(line)
-                print('----> {}'.format(info))
+                logger.debug(f'Info: {info}')
                 if strings.ERROR not in info:
                     write_new_row(repo.name + '.csv', [info.get(f) for f in config.FIELDS])
 
         if str(file.type) == 'dir':
             get_dir_content(repo, os.path.join(path, file.name))
 
-# Then play with your Github objects:
 
 if __name__ == '__main__':
-
-    # First create a Github instance:
-
-    # Test
     # Logger Format
-    logging.basicConfig(level=logging.INFO,
-                        format='[%(asctime)-15s] %(levelname)-6s %(message)s',
-                        datefmt='%d/%b/%Y %H:%M:%S')
+    logging.basicConfig(
+        level=logging.INFO,
+        format='[%(asctime)-15s] %(levelname)-6s %(message)s',
+        datefmt='%d/%b/%Y %H:%M:%S',
+    )
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-t', '--token', dest='token', type=str, required=False, help='Github Token')
+    parser.add_argument('--debug', type=bool, default=False, help='Debug Mode')
     parser.add_argument('org', metavar='org', type=str, help='GitHub Org')
 
     args = parser.parse_args()
+
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+
     logger.info('--------------')
 
-    # or using an access token
+    # Uses an access token
     if args.token:
         access_token = args.token
     else:
@@ -81,6 +83,7 @@ if __name__ == '__main__':
     g = Github(access_token)
 
     for index, repo in enumerate(g.get_organization(args.org).get_repos()):
-        print('{}: {}'.format(index, repo.name))
+        logger.info(f'Starting process for {index}: {repo.name}')
         write_new_row(repo.name + '.csv', config.FIELDS)
         get_dir_content(repo, '/')
+        logger.info(f'End of process for {index}: {repo.name}')
