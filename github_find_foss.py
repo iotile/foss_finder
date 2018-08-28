@@ -5,6 +5,7 @@ import base64
 import re
 import logging
 import argparse
+import getpass
 
 from github import Github, GithubException
 
@@ -77,7 +78,9 @@ if __name__ == '__main__':
     )
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('-t', '--token', dest='token', type=str, required=False, help='Github Token')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-t', '--token', dest='token', type=str, help='Github Token')
+    group.add_argument('-u', '--username', dest='username', type=str, help='Github Username')
     parser.add_argument('-o', '--outdir', dest='outdir', type=str, default='out', help='Output directory')
     parser.add_argument('--project', type=str, required=False, help='Process a specific repository')
     parser.add_argument('--debug', type=bool, default=False, help='Debug Mode')
@@ -88,17 +91,16 @@ if __name__ == '__main__':
     if args.debug:
         logger.setLevel(logging.DEBUG)
 
-    logger.info('--------------')
-
-    # Uses an access token
     if args.token:
-        access_token = args.token
+        g = Github(args.token)
+    elif args.username:
+        g = Github(args.username, getpass.getpass(prompt='Github Password: '))
     else:
-        access_token = input('GitHub Access Token? ')
-
-    g = Github(access_token)
+        logger.error('Please provide a token or a username.')
 
     tracker = FossTracker()
+
+    logger.info('--------------')
 
     if args.project:
         repo = g.get_organization(args.org).get_repo(args.project)
