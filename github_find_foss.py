@@ -2,8 +2,10 @@ import sys
 import os
 import json
 import base64
+import re
 import logging
 import argparse
+import getpass
 
 from github import Github, GithubException
 
@@ -16,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 def get_dir_content(repo, path, output_path, tracker):
     logger.debug(f'+++++ {path}')
+    python_regex = r".*requirements.*\.txt$"
     
     try:
         files = repo.get_dir_contents(path)
@@ -24,8 +27,8 @@ def get_dir_content(repo, path, output_path, tracker):
         return None
 
     for file in files:
+        full_path_name = os.path.join(path, file.name)
         if os.path.basename(file.name) in ['package.json', 'bower.json']:
-            full_path_name = os.path.join(path, file.name)
             logger.info(f'Found {full_path_name} ({file.type})')
             file_content = repo.get_file_contents(full_path_name)
             decoded_file = base64.b64decode(file_content.content)
@@ -41,8 +44,7 @@ def get_dir_content(repo, path, output_path, tracker):
                         if strings.ERROR not in info:
                             tracker.add_foss_to_project(repo.name, [info.get(f) for f in config.FIELDS])
 
-        if os.path.basename(file.name) in ['requirements.txt', 'base.txt', 'development.txt', 'docker.txt', 'production.txt']:
-            full_path_name = os.path.join(path, file.name)
+        if re.match(python_regex, full_path_name):
             logger.info(f'Found {full_path_name} ({file.type})')
             file_content = repo.get_file_contents(full_path_name)
             decoded_file = base64.b64decode(file_content.content).decode('utf-8')
@@ -76,7 +78,9 @@ if __name__ == '__main__':
     )
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('-t', '--token', dest='token', type=str, required=False, help='Github Token')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-t', '--token', dest='token', type=str, help='Github Token')
+    group.add_argument('-u', '--username', dest='username', type=str, help='Github Username')
     parser.add_argument('-o', '--outdir', dest='outdir', type=str, default='out', help='Output directory')
     parser.add_argument('--project', type=str, required=False, help='Process a specific repository')
     parser.add_argument('--debug', type=bool, default=False, help='Debug Mode')
@@ -87,17 +91,16 @@ if __name__ == '__main__':
     if args.debug:
         logger.setLevel(logging.DEBUG)
 
-    logger.info('--------------')
-
-    # Uses an access token
     if args.token:
-        access_token = args.token
+        g = Github(args.token)
+    elif args.username:
+        g = Github(args.username, getpass.getpass(prompt='Github Password: '))
     else:
-        access_token = input('GitHub Access Token? ')
-
-    g = Github(access_token)
+        logger.error('Please provide a token or a username.')
 
     tracker = FossTracker()
+
+    logger.info('--------------')
 
     if args.project:
         repo = g.get_organization(args.org).get_repo(args.project)
