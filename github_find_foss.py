@@ -34,7 +34,7 @@ def get_dir_content(repo, path, output_path, tracker):
             decoded_file = base64.b64decode(file_content.content)
 
             obj = json.loads(decoded_file)
-            for section in ['devDependencies', 'dependencies', 'engines']:
+            for section in config.NPM_SECTIONS:
                 if section in obj:
                     for name in obj[section].keys():
                         version = obj[section][name]

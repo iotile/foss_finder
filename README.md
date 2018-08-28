@@ -19,7 +19,7 @@ pip install -r requirements.txt
 
 ## How to use the script
 
-### Basic use
+### Basic usage
 
 The script is fairly easy to use but if you need any help, you can run:
 
@@ -49,7 +49,11 @@ Finally, you can add `--debug True` to enable debug mode.
 
 ### Configuration
 
-The main config file for the script is `/config/config.py`. You can change the `FIELDS` value to configure the structure of the output csv files.
+The main config file for the script is `/config/config.py`.
+
+You can change the `FIELDS` value to configure the structure of the output csv files.
+
+You can change the `NPM_SECTIONS` value to configure the sections of _package.json_ and _bower.json_ where the script looks for dependencies.
 
 ## Development
 
