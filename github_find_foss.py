@@ -79,12 +79,12 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-t', '--token', dest='token', type=str, help='Github Token')
-    group.add_argument('-u', '--username', dest='username', type=str, help='Github Username')
-    parser.add_argument('-o', '--outdir', dest='outdir', type=str, default='out', help='Output directory')
-    parser.add_argument('--project', type=str, required=False, help='Process a specific repository')
-    parser.add_argument('--debug', type=bool, default=False, help='Debug Mode')
-    parser.add_argument('org', metavar='org', type=str, help='GitHub Org')
+    group.add_argument('-t', '--token', dest='token', type=str, help='GitHub token')
+    group.add_argument('-u', '--username', dest='username', type=str, help='GitHub username')
+    parser.add_argument('-o', '--outdir', dest='outdir', type=str, default='out', help='output directory')
+    parser.add_argument('--project', type=str, required=False, help='process a specific repository')
+    parser.add_argument('--debug', type=bool, default=False, help='debug mode')
+    parser.add_argument('org', metavar='org', type=str, help='GitHub organization')
 
     args = parser.parse_args()
 
