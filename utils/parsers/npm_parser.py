@@ -12,9 +12,15 @@ class NpmPackageParser(object):
         if version:
             version = NpmPackageParser.parse_version(version)
 
-        url = 'https://registry.npmjs.org/{}/latest/'.format(name)
-        #if version:
-        #    url += '{}/'.format(version)
+        # regex to check if the package is scoped (URL is different)
+        scope_regex = r"(?P<scope>@([.a-zA-Z0-9_-]|\[|\])+)/(?P<module>([.a-zA-Z0-9_-]|\[|\])+)$"
+        parts = re.match(scope_regex, name)
+        if parts:
+            scope = parts.group('scope')
+            module = parts.group('module')            
+            url = f'https://registry.npmjs.org/{scope}%2F{module}/'
+        else:
+            url = f'https://registry.npmjs.org/{name}/latest/'
 
         resp = requests.get(url)
         info = {
