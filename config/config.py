@@ -12,7 +12,7 @@ FIELDS = [
 ]
 
 # Path of the INI configuration file (relative to the root of foss_finder)
-INI_PATH = '.foss_finder.ini'
+INI_PATH = '.foss_finder'
 
 # Processing of the INI configuration file
 ini_config = configparser.ConfigParser()
