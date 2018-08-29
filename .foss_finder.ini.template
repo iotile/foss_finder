@@ -1,0 +1,25 @@
+[NPM sections]
+# Relevant sections to look for production dependencies in package.json / bower.json
+npm_prod=dependencies,
+    peerDependencies,
+    optionalDependencies
+# Relevant sections to look for development dependencies in package.json / bower.json
+npm_dev=devDependencies,
+    engines
+
+[Python files]
+# Relevant files to look for production Python dependencies
+py_prod=/requirements.txt,
+    /requirements/base.txt,
+    /requirements/production.txt
+# Relevant files to look for development Python dependencies
+py_dev=/requirements-build.txt,
+    /requirements/development.txt,
+    /requirements/docker.txt
+
+[Ignored repositories]
+# Names of repositories that should be ignored
+ignored_repos=Foo,
+    Bar,
+    Foo2,
+    Bar2
