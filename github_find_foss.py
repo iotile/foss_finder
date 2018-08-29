@@ -101,26 +101,33 @@ if __name__ == '__main__':
         python_files.extend(config.PYTHON_FILES[strings.DEVELOPMENT])
         python_files = list(set(python_files))
 
-    if args.token:
-        g = Github(args.token)
-    elif args.username:
-        g = Github(args.username, getpass.getpass(prompt='Github Password: '))
-    else:
-        logger.error('Please provide a token or a username.')
+    try:
+        if args.token:
+            g = Github(args.token)
+            organization = g.get_organization(args.org)
+        elif args.username:
+            g = Github(args.username, getpass.getpass(prompt='Github Password: '))
+            organization = g.get_organization(args.org)
+        else:
+            logger.critical('Please provide a token or a username')
+            sys.exit()
+    except GithubException:
+        logger.critical('Bad credentials')
+        sys.exit()
 
     tracker = FossTracker()
 
     logger.info('--------------')
 
     if args.project:
-        repo = g.get_organization(args.org).get_repo(args.project)
+        repo = organization.get_repo(args.project)
         logger.info(f'Starting process for {repo.name}')
         process_project(repo, tracker, args.outdir, npm_sections, python_files)
         logger.info(f'End of process for {repo.name}')
         for line in tracker.report_project_summary(repo.name):
             logger.info(line)
     else:
-        for index, repo in enumerate(g.get_organization(args.org).get_repos()):
+        for index, repo in enumerate(organization.get_repos()):
             logger.info(f'Starting process for {index}: {repo.name}')
             if repo.name not in config.IGNORED_REPOS:
                 process_project(repo, tracker, args.outdir, npm_sections, python_files)
