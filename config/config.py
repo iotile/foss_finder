@@ -1,3 +1,5 @@
+import configparser
+
 from .strings import * 
 
 # Fields of the CSV files (ordered)
@@ -9,13 +11,19 @@ FIELDS = [
     URL,
 ]
 
-# Sections of package.json/bower.json where the script looks for dependencies
-NPM_SECTIONS = [
-    'dependencies',
-    'devDependencies',
-    'peerDependencies',
-    'bundledDependencies',
-    'bundleDependencies',
-    'optionalDependencies',
-    'engines',
-]
+# Path of the INI configuration file (relative to the root of foss_finder)
+INI_PATH = '.foss_finder.ini'
+
+# Processing of the INI configuration file
+ini_config = configparser.ConfigParser()
+ini_config.read(INI_PATH)
+# Exposed variables
+NPM_SECTIONS = {
+    PRODUCTION: ini_config['NPM sections']['npm_prod'].replace(',', '').split('\n'),
+    DEVELOPMENT: ini_config['NPM sections']['npm_dev'].replace(',', '').split('\n'),
+}
+PYTHON_FILES = {
+    PRODUCTION: ini_config['Python files']['py_prod'].replace(',', '').split('\n'),
+    DEVELOPMENT: ini_config['Python files']['py_dev'].replace(',', '').split('\n'),
+}
+IGNORED_REPOS = ini_config['Ignored repositories']['ignored_repos'].replace(',', '').split('\n')
