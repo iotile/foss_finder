@@ -16,7 +16,7 @@ from config import strings, config
 logger = logging.getLogger(__name__)
 
 
-def get_dir_content(repo, path, output_path, tracker):
+def get_dir_content(repo, path, output_path, tracker, npm_sections, python_files):
     logger.debug(f'+++++ {path}')
     python_regex = r".*requirements.*\.txt$"
     
@@ -34,7 +34,7 @@ def get_dir_content(repo, path, output_path, tracker):
             decoded_file = base64.b64decode(file_content.content)
 
             obj = json.loads(decoded_file)
-            for section in ['devDependencies', 'dependencies', 'engines']:
+            for section in npm_sections:
                 if section in obj:
                     for name in obj[section].keys():
                         version = obj[section][name]
@@ -44,7 +44,7 @@ def get_dir_content(repo, path, output_path, tracker):
                         if strings.ERROR not in info:
                             tracker.add_foss_to_project(repo.name, [info.get(f) for f in config.FIELDS])
 
-        if re.match(python_regex, full_path_name):
+        if any([name in full_path_name for name in python_files]):
             logger.info(f'Found {full_path_name} ({file.type})')
             file_content = repo.get_file_contents(full_path_name)
             decoded_file = base64.b64decode(file_content.content).decode('utf-8')
@@ -58,14 +58,14 @@ def get_dir_content(repo, path, output_path, tracker):
                     tracker.add_foss_to_project(repo.name, [info.get(f) for f in config.FIELDS])
 
         if str(file.type) == 'dir':
-            get_dir_content(repo, os.path.join(path, file.name), output_path, tracker)
+            get_dir_content(repo, os.path.join(path, file.name), output_path, tracker, npm_sections, python_files)
 
 
-def process_project(repo, tracker, outdir):
+def process_project(repo, tracker, outdir, npm_sections, python_files):
     output_path = os.path.join(outdir, repo.name + '.csv')
     os.makedirs(outdir, exist_ok=True)
     tracker.add_project(repo.name)
-    get_dir_content(repo, '/', output_path, tracker)
+    get_dir_content(repo, '/', output_path, tracker, npm_sections, python_files)
     tracker.write_project_csv(repo.name, config.FIELDS, output_path)
 
 
@@ -83,36 +83,56 @@ if __name__ == '__main__':
     group.add_argument('-u', '--username', dest='username', type=str, help='GitHub username')
     parser.add_argument('-o', '--outdir', dest='outdir', type=str, default='out', help='output directory')
     parser.add_argument('--project', type=str, required=False, help='process a specific repository')
-    parser.add_argument('--debug', type=bool, default=False, help='debug mode')
+    parser.add_argument('--dev', action='store_true', help='activate lookup for dev dependencies')    
+    parser.add_argument('--debug', action='store_true', help='debug mode')
     parser.add_argument('org', metavar='org', type=str, help='GitHub organization')
 
     args = parser.parse_args()
 
     if args.debug:
         logger.setLevel(logging.DEBUG)
+    
+    # NPM sections and Python files
+    npm_sections = config.NPM_SECTIONS[strings.PRODUCTION]
+    python_files = config.PYTHON_FILES[strings.PRODUCTION]
+    if args.dev:
+        npm_sections.extend(config.NPM_SECTIONS[strings.DEVELOPMENT])
+        npm_sections = list(set(npm_sections))
+        python_files.extend(config.PYTHON_FILES[strings.DEVELOPMENT])
+        python_files = list(set(python_files))
 
-    if args.token:
-        g = Github(args.token)
-    elif args.username:
-        g = Github(args.username, getpass.getpass(prompt='Github Password: '))
-    else:
-        logger.error('Please provide a token or a username.')
+    try:
+        if args.token:
+            g = Github(args.token)
+            organization = g.get_organization(args.org)
+        elif args.username:
+            g = Github(args.username, getpass.getpass(prompt='Github Password: '))
+            organization = g.get_organization(args.org)
+        else:
+            logger.critical('Please provide a token or a username')
+            sys.exit()
+    except GithubException:
+        logger.critical('Bad credentials')
+        sys.exit()
 
     tracker = FossTracker()
 
     logger.info('--------------')
 
     if args.project:
-        repo = g.get_organization(args.org).get_repo(args.project)
+        repo = organization.get_repo(args.project)
         logger.info(f'Starting process for {repo.name}')
-        process_project(repo, tracker, args.outdir)
+        process_project(repo, tracker, args.outdir, npm_sections, python_files)
         logger.info(f'End of process for {repo.name}')
         for line in tracker.report_project_summary(repo.name):
             logger.info(line)
     else:
-        for index, repo in enumerate(g.get_organization(args.org).get_repos()):
+        for index, repo in enumerate(organization.get_repos()):
             logger.info(f'Starting process for {index}: {repo.name}')
-            process_project(repo, tracker, args.outdir)
+            if repo.name not in config.IGNORED_REPOS:
+                process_project(repo, tracker, args.outdir, npm_sections, python_files)
+            else:
+                logger.info('Ignored')
             logger.info(f'End of process for {index}: {repo.name}')
         for line in tracker.report_total_summary():
             logger.info(line)

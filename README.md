@@ -19,7 +19,7 @@ pip install -r requirements.txt
 
 ## How to use the script
 
-### Basic use
+### Basic usage
 
 The script is fairly easy to use but if you need any help, you can run:
 
@@ -45,11 +45,32 @@ The above commands run the script on all the repositories of the organization. I
 
 By default, the reports are stored in csv format in a directory named _out_. The names of the reports are _<name_of_your_repository>.csv_. You can change the directory where these csv files are saved by adding `-o <relative_path_of_directory>`.
 
-Finally, you can add `--debug True` to enable debug mode.
+By default, the script only looks for production dependencies. If you wish to look for development and build dependencies too, then you can add `--dev`. Production vs development dependencies are defined by a configuration file (see below).
+
+Finally, you can add `--debug` to enable debug mode.
 
 ### Configuration
 
-The main config file for the script is `/config/config.py`. You can change the `FIELDS` value to configure the structure of the output csv files.
+The main config file for the script is `/config/config.py`.
+
+The `FIELDS` value defines the structure of the output csv files.
+
+The `INI_PATH` value defines the path of the INI configuration file, which is the file you want to change to get the script doing what you want.
+
+By default, this INI configuration file is named *.foss_finder*. It contains three sections and several keys.
+
+#### NPM sections
+
+The keys define the sections that are looked for inside _package.json_ and _bower.json_ (NPM dependencies). `npm_prod` defines the sections which correspond to production and `npm_dev` defines the sections which correspond to development (they are looked for when you use the `--dev` argument).
+
+#### Python files
+
+The keys define the files that are looked for (Python dependencies). `py_prod` corresponds to the production files and `py_dev` corresponds to the development files.  
+The files that are looked for are those whose name contains the name of one of the files defined here. For instance, if `py_prod` contains _/requirements.txt_, then the following files will match: _/requirements.txt_, _/somefolder/requirements.txt_. So, be careful to include the '/' because if it contained _requirements.txt_, then _dev_requirements.txt_ would match!
+
+#### Ignored repositories
+
+`ignored_repos` is simply the list of the repositories which should be ignored. If a repo contains no dependency but does have multiple different folders, you want to include it here so that the script doesn't waste a lot of time trying to find dependencies in all these folders.
 
 ## Development
 
@@ -68,5 +89,6 @@ The main config file for the script is `/config/config.py`. You can change the `
 │   │   └── pypi_parser.py -> parser to get Python packages info from files like requirements.txt
 │   └── tracker            -> a tracker should keep track of the info of packages and other stats
 │       └── tracker.py     -> class implementing a tracker to keep info and stats
+├── .foss_finder           -> INI configuration file
 └── github_find_foss.py    -> main script to recursively look for requirements files
 ```
