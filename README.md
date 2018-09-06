@@ -17,6 +17,12 @@ pip install -U pip
 pip install -r requirements.txt
 ```
 
+The NPM parser uses the NPM package called `semver`, which must be installed too:
+
+```
+npm install
+```
+
 ## How to use the script
 
 ### Basic usage
