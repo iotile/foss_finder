@@ -14,7 +14,7 @@ semver = js2py.require('semver')
 class NpmPackageParser(object):
 
     @classmethod
-    def get_package_info(cls, name, version_spec):
+    def get_package_info(cls, name, version_spec, depth, npm_sections):
         # regex to check if the package is scoped (URL is different)
         scope_regex = r"(?P<scope>@([.a-zA-Z0-9_-]|\[|\])+)/(?P<module>([.a-zA-Z0-9_-]|\[|\])+)$"
         parts = re.match(scope_regex, name)
@@ -27,8 +27,10 @@ class NpmPackageParser(object):
 
         resp = requests.get(url)
         info = {
-            strings.REGISTRY: 'NPM',
-            strings.PACKAGE: name,
+            name: {
+                strings.REGISTRY: 'NPM',
+                strings.PACKAGE: name,
+            },
         }
 
         if resp.status_code == 200:
@@ -39,20 +41,29 @@ class NpmPackageParser(object):
                     package_version = version
                     break
             if package_version is None:
-                info[strings.ERROR] = 'No valid version found in NPM registry'
+                info[name][strings.ERROR] = 'No valid version found in NPM registry'
                 return info
-            info[strings.VERSION] = package_version
+            info[name][strings.VERSION] = package_version
             package_info_version = package_info['versions'][package_version]
 
             if 'license' in package_info_version:
                 if type(package_info_version['license']) is dict:
-                    info[strings.LICENSE] = package_info_version['license']['type']
+                    info[name][strings.LICENSE] = package_info_version['license']['type']
                 else:
-                    info[strings.LICENSE] = package_info_version['license']
-            if 'homepage' in package_info:
-                info[strings.URL] = package_info['homepage']
+                    info[name][strings.LICENSE] = package_info_version['license']
+            if 'homepage' in package_info_version:
+                info[name][strings.URL] = package_info_version['homepage']
+            if depth > 0:
+                for section in npm_sections:
+                    if section in package_info_version:
+                        for dep_name in package_info_version[section].keys():
+                            dep_version = package_info_version[section][dep_name]
+                            dep_info = NpmPackageParser.get_package_info(
+                                dep_name.lower(), dep_version, depth-1, npm_sections
+                            )
+                            info = {**dep_info, **info}
         else:
-            info[strings.ERROR] = 'Package not found in NPM registry'
+            info[name][strings.ERROR] = 'Package not found in NPM registry'
 
         return info
 
