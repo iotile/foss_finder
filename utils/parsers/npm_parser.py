@@ -52,6 +52,11 @@ class NpmPackageParser(object):
                     info[0][strings.LICENSE] = package_info_version['license']['type']
                 else:
                     info[0][strings.LICENSE] = package_info_version['license']
+            elif 'licenses' in package_info_version:
+                if len(package_info_version['licenses']) == 1:
+                    info[0][strings.LICENSE] = package_info_version['licenses'][0]['type']
+                else:
+                    info[0][strings.LICENSE] = '(' + ' OR '.join([lic['type'] for lic in package_info_version['licenses']]) + ')'
             if 'homepage' in package_info_version:
                 info[0][strings.URL] = package_info_version['homepage']
             if depth > 0:
