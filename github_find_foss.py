@@ -40,8 +40,8 @@ def get_dir_content(repo, path, output_path, tracker, npm_sections, npm_depth, p
                         version = obj[section][name]
                         logger.debug(f'Processing module {name}: {version}')
                         info = NpmPackageParser.get_package_info(name.lower(), version, npm_depth, npm_sections, config.USE_SEMVER)
-                        logger.debug(f'Info: {info[name.lower()]}')
-                        for pkg, pkg_info in info.items():
+                        logger.debug(f'Info: {info[0]}')
+                        for pkg_info in info:
                             if strings.ERROR not in pkg_info:
                                 tracker.add_foss_to_project(repo.name, [pkg_info.get(f) for f in config.FIELDS])
 
