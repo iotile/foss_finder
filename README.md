@@ -57,7 +57,12 @@ The `FIELDS` value defines the structure of the output csv files.
 
 The `INI_PATH` value defines the path of the INI configuration file, which is the file you want to change to get the script doing what you want.
 
-By default, this INI configuration file is named *.foss_finder*. It contains three sections and several keys.
+By default, this INI configuration file is named *.foss_finder*. It contains four sections and several keys.
+
+#### NPM parser
+
+`use_semver` is a boolean. _semver_ is a NPM package (https://github.com/npm/node-semver) that is used by NPM to parse the version contraints in _package.json_.  
+By default, the script doesn't use _semver_ because it introduces a dependency to NPM (and NodeJS). Instead, it uses a simple parser made in Python. You can still set `use_semver` to `true` to try to use _semver_ and get better results. In this case, don't forget to install NodeJS and NPM. However, there is no need to install _semver_ as _js2py_ will do it automatically.
 
 #### NPM sections
 

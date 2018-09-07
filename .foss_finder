@@ -1,3 +1,7 @@
+[NPM parser]
+# Requires NodeJS and NPM
+use_semver=false
+
 [NPM sections]
 # Relevant sections to look for production dependencies in package.json / bower.json
 npm_prod=dependencies,

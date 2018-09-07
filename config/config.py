@@ -18,6 +18,7 @@ INI_PATH = '.foss_finder'
 ini_config = configparser.ConfigParser()
 ini_config.read(INI_PATH)
 # Exposed variables
+USE_SEMVER = ini_config['NPM parser'].getboolean('use_semver')
 NPM_SECTIONS = {
     PRODUCTION: ini_config['NPM sections']['npm_prod'].replace(',', '').split('\n'),
     DEVELOPMENT: ini_config['NPM sections']['npm_dev'].replace(',', '').split('\n'),

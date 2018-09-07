@@ -1,2 +1,3 @@
 requirements-parser==0.1.0
 PyGithub
+js2py
