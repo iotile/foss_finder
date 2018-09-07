@@ -39,7 +39,7 @@ def get_dir_content(repo, path, output_path, tracker, npm_sections, npm_depth, p
                     for name in obj[section].keys():
                         version = obj[section][name]
                         logger.debug(f'Processing module {name}: {version}')
-                        info = NpmPackageParser.get_package_info(name.lower(), version, npm_depth, npm_sections)
+                        info = NpmPackageParser.get_package_info(name.lower(), version, npm_depth, npm_sections, config.USE_SEMVER)
                         logger.debug(f'Info: {info[name.lower()]}')
                         for pkg, pkg_info in info.items():
                             if strings.ERROR not in pkg_info:
