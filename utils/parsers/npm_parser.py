@@ -4,11 +4,12 @@ import re
 
 import js2py
 
-from config import strings
+from config import strings, config
 
 
-# parser for npm versions
-semver = js2py.require('semver')
+if config.USE_SEMVER:
+    # parser for npm versions
+    semver = js2py.require('semver')
 
 
 class NpmPackageParser(object):

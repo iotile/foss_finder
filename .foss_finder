@@ -1,4 +1,5 @@
 [NPM parser]
+# Requires NodeJS and NPM
 use_semver=false
 
 [NPM sections]
