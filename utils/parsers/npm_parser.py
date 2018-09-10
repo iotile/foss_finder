@@ -80,13 +80,15 @@ class NpmPackageParser(object):
     def satisfies(cls, version, version_spec, use_semver=False):
         if use_semver:
             # js2py isn't perfect so we treat special cases to prevent an infinite loop...
+            if version_spec == '^' + version:
+                return True
+            if version_spec == "*":
+                return True
             regex = r"(?P<maj>[0-9]+)\.(?P<min>[0-9]+)\.(?P<pat>[0-9]+)-?(?P<tag>[.a-z0-9]*)"
             # if only a version is given in the spec, then only this version is valid
             match = re.match(regex, version_spec)
             if match is not None and match.span() == (0, len(version_spec)):
                 return version == version_spec
-            if version_spec == '^' + version:
-                return True
             return semver.satisfies(version, version_spec)
         else:
             version_regex = r"(?P<maj>[0-9]+)(\.(?P<min>[0-9]+))?(\.(?P<pat>[0-9]+))?-?(?P<tag>[.a-z0-9]*)"
