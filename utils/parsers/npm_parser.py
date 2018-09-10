@@ -27,12 +27,12 @@ class NpmPackageParser(object):
             url = f'https://registry.npmjs.org/{name}/'
 
         resp = requests.get(url)
-        info = {
-            name: {
+        info = [
+            {
                 strings.REGISTRY: 'NPM',
                 strings.PACKAGE: name,
-            },
-        }
+            }
+        ]
 
         if resp.status_code == 200:
             package_info = json.loads(resp.content.decode())
@@ -42,18 +42,23 @@ class NpmPackageParser(object):
                     package_version = version
                     break
             if package_version is None:
-                info[name][strings.ERROR] = 'No valid version found in NPM registry'
+                info[0][strings.ERROR] = 'No valid version found in NPM registry'
                 return info
-            info[name][strings.VERSION] = package_version
+            info[0][strings.VERSION] = package_version
             package_info_version = package_info['versions'][package_version]
 
             if 'license' in package_info_version:
                 if type(package_info_version['license']) is dict:
-                    info[name][strings.LICENSE] = package_info_version['license']['type']
+                    info[0][strings.LICENSE] = package_info_version['license']['type']
                 else:
-                    info[name][strings.LICENSE] = package_info_version['license']
+                    info[0][strings.LICENSE] = package_info_version['license']
+            elif 'licenses' in package_info_version:
+                if len(package_info_version['licenses']) == 1:
+                    info[0][strings.LICENSE] = package_info_version['licenses'][0]['type']
+                else:
+                    info[0][strings.LICENSE] = '(' + ' OR '.join([lic['type'] for lic in package_info_version['licenses']]) + ')'
             if 'homepage' in package_info_version:
-                info[name][strings.URL] = package_info_version['homepage']
+                info[0][strings.URL] = package_info_version['homepage']
             if depth > 0:
                 for section in npm_sections:
                     if section in package_info_version:
@@ -62,9 +67,12 @@ class NpmPackageParser(object):
                             dep_info = NpmPackageParser.get_package_info(
                                 dep_name.lower(), dep_version, depth-1, npm_sections, use_semver=use_semver
                             )
-                            info = {**dep_info, **info}
+                            # update info with no duplicate
+                            for pkg_info in dep_info:
+                                if pkg_info not in info:
+                                    info.append(pkg_info)
         else:
-            info[name][strings.ERROR] = 'Package not found in NPM registry'
+            info[0][strings.ERROR] = 'Package not found in NPM registry'
 
         return info
 
@@ -72,13 +80,15 @@ class NpmPackageParser(object):
     def satisfies(cls, version, version_spec, use_semver=False):
         if use_semver:
             # js2py isn't perfect so we treat special cases to prevent an infinite loop...
+            if version_spec == '^' + version:
+                return True
+            if version_spec == "*":
+                return True
             regex = r"(?P<maj>[0-9]+)\.(?P<min>[0-9]+)\.(?P<pat>[0-9]+)-?(?P<tag>[.a-z0-9]*)"
             # if only a version is given in the spec, then only this version is valid
             match = re.match(regex, version_spec)
             if match is not None and match.span() == (0, len(version_spec)):
                 return version == version_spec
-            if version_spec == '^' + version:
-                return True
             return semver.satisfies(version, version_spec)
         else:
             version_regex = r"(?P<maj>[0-9]+)(\.(?P<min>[0-9]+))?(\.(?P<pat>[0-9]+))?-?(?P<tag>[.a-z0-9]*)"
