@@ -3,7 +3,7 @@ from version import version
 
 setup(
     name="foss_finder",
-    packages=find_packages(exclude=("tests",)),
+    packages=find_packages(exclude=("test",)),
     version=version,
     install_requires=[
         "requirements-parser == 0.1.0",
