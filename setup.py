@@ -3,10 +3,9 @@ from version import version
 
 setup(
     name="foss_finder",
-    packages=find_packages(exclude=("test",)),
+    packages=find_packages(exclude=("tests",)),
     version=version,
     install_requires=[
-        "future",
         "requirements-parser == 0.1.0",
         "PyGithub"
     ],
