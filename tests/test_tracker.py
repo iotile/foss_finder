@@ -1,7 +1,7 @@
 import unittest2 as unittest
 import pytest
 
-from foss_finder.utils.tracker.tracker import FossTracker
+from ..foss_finder.utils.tracker.tracker import FossTracker
 
 
 class TrackerTestCase(unittest.TestCase):
