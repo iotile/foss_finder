@@ -11,7 +11,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'foss-finder-cli = foss_finder.foss_finder_cli:main'
+            'foss-finder-cli = foss_finder.scripts.foss_finder_cli:main'
         ]
     },
     include_package_data=True,

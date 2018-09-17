@@ -9,9 +9,9 @@ import getpass
 
 from github import Github, GithubException
 
-from .utils.parsers import NpmPackageParser, PyPiRequirementParser
-from .utils.tracker import FossTracker
-from .config import strings, config
+from ..utils.parsers import NpmPackageParser, PyPiRequirementParser
+from ..utils.tracker import FossTracker
+from ..config import strings, config
 
 logger = logging.getLogger(__name__)
 
@@ -146,8 +146,4 @@ def main():
             logger.info(line)
 
     return 0
-
-
-if __name__ == '__main__':
-    sys.exit(main())
 
