@@ -2,7 +2,7 @@ import requests
 import json
 import re
 
-from config import strings
+from foss_finder.config import strings
 
 
 class PyPiRequirementParser(object):

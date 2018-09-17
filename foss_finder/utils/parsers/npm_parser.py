@@ -2,14 +2,18 @@ import requests
 import json
 import re
 
-import js2py
-
-from config import strings, config
+from foss_finder.config import strings, config
 
 
+semver = None
 if config.USE_SEMVER:
-    # parser for npm versions
-    semver = js2py.require('semver')
+    try:
+        import js2py
+
+        # parser for npm versions
+        semver = js2py.require('semver')
+    except Exception as e:
+        print(e)
 
 
 class NpmPackageParser(object):
@@ -78,7 +82,7 @@ class NpmPackageParser(object):
 
     @classmethod
     def satisfies(cls, version, version_spec, use_semver=False):
-        if use_semver:
+        if use_semver and semver:
             # js2py isn't perfect so we treat special cases to prevent an infinite loop...
             if version_spec == '^' + version:
                 return True

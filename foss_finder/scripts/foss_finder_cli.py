@@ -9,9 +9,9 @@ import getpass
 
 from github import Github, GithubException
 
-from utils.parsers import NpmPackageParser, PyPiRequirementParser
-from utils.tracker import FossTracker
-from config import strings, config
+from ..utils.parsers import NpmPackageParser, PyPiRequirementParser
+from ..utils.tracker import FossTracker
+from ..config import strings, config
 
 logger = logging.getLogger(__name__)
 
@@ -70,14 +70,7 @@ def process_project(repo, tracker, outdir, npm_sections, npm_depth, python_files
     tracker.write_project_csv(repo.name, config.FIELDS, output_path)
 
 
-if __name__ == '__main__':
-    # Logger Format
-    logging.basicConfig(
-        level=logging.INFO,
-        format='[%(asctime)-15s] %(levelname)-6s %(message)s',
-        datefmt='%d/%b/%Y %H:%M:%S',
-    )
-
+def build_parser():
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-t', '--token', dest='token', type=str, help='GitHub token')
@@ -85,15 +78,28 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--outdir', dest='outdir', type=str, default='out', help='output directory')
     parser.add_argument('--npm_depth', dest='npm_depth', type=int, default=0, help='depth for NPM dependencies')
     parser.add_argument('--project', type=str, required=False, help='process a specific repository')
-    parser.add_argument('--dev', action='store_true', help='activate lookup for dev dependencies')    
+    parser.add_argument('--dev', action='store_true', help='activate lookup for dev dependencies')
     parser.add_argument('--debug', action='store_true', help='debug mode')
     parser.add_argument('org', metavar='org', type=str, help='GitHub organization')
+
+    return parser
+
+
+def main():
+    # Logger Format
+    logging.basicConfig(
+        level=logging.INFO,
+        format='[%(asctime)-15s] %(levelname)-6s %(message)s',
+        datefmt='%d/%b/%Y %H:%M:%S',
+    )
+    parser = build_parser()
+    args = parser.parse_args()
 
     args = parser.parse_args()
 
     if args.debug:
         logger.setLevel(logging.DEBUG)
-    
+
     # NPM sections and Python files
     npm_sections = config.NPM_SECTIONS[strings.PRODUCTION]
     python_files = config.PYTHON_FILES[strings.PRODUCTION]
@@ -138,3 +144,6 @@ if __name__ == '__main__':
             logger.info(f'End of process for {index}: {repo.name}')
         for line in tracker.report_total_summary():
             logger.info(line)
+
+    return 0
+

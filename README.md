@@ -14,7 +14,7 @@ Once the virtual environment is set up, simply install the dependencies with:
 
 ```
 pip install -U pip
-pip install -r requirements.txt
+pip install -U foss_finder
 ```
 
 ## How to use the script
@@ -24,19 +24,19 @@ pip install -r requirements.txt
 The script is fairly easy to use but if you need any help, you can run:
 
 ```
-python github_find_foss.py -h
+foss-finder-cli -h
 ```
 
 The standard way to run the script is to get an access token for your GitHub organization, then run:
 
 ```
-python github_find_foss.py -t <your_access_token> <name_of_your_organization>
+foss-finder-cli -t <your_access_token> <name_of_your_organization>
 ```
 
 Alternatively, you can directly use your GitHub username to login:
 
 ```
-python github_find_foss.py -u <your_username> <name_of_your_organization>
+foss-finder-cli -u <your_username> <name_of_your_organization>
 ```
 
 ### Other options
@@ -82,7 +82,7 @@ The files that are looked for are those whose name contains the name of one of t
 ### Architecture of the project's directories
 
 ```
-.
+foss_finder
 ├── config
 │   ├── config.py          -> configuration of the fields in csv files
 │   └── strings.py         -> strings that are used in many locations in the code
@@ -94,6 +94,7 @@ The files that are looked for are those whose name contains the name of one of t
 │   │   └── pypi_parser.py -> parser to get Python packages info from files like requirements.txt
 │   └── tracker            -> a tracker should keep track of the info of packages and other stats
 │       └── tracker.py     -> class implementing a tracker to keep info and stats
+│   └── scripts            -> Entry Point
+│       └── foss_finder_cli.py -> main script to recursively look for requirements files
 ├── .foss_finder           -> INI configuration file
-└── github_find_foss.py    -> main script to recursively look for requirements files
 ```

@@ -1,0 +1,9 @@
+pytest==3.0.6
+pytest-localserver==0.3.7
+pytest-logging==2015.11.4
+pyOpenSSL==17.3.0
+unittest2==1.1
+coverage==3.7.1
+coveralls==1.1
+mock==2.0.0
+future==0.16.0

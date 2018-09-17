@@ -1,0 +1,3 @@
+pip
+twine
+tox==2.6.0
