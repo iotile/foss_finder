@@ -29,7 +29,10 @@ if 'NPM sections' in ini_config:
         DEVELOPMENT: ini_config['NPM sections']['npm_dev'].replace(',', '').split('\n'),
     }
 else:
-    NPM_SECTIONS = {}
+    NPM_SECTIONS = {
+        PRODUCTION: [],
+        DEVELOPMENT: [],
+    }
 
 if 'Python files' in ini_config:
     PYTHON_FILES = {
@@ -37,7 +40,12 @@ if 'Python files' in ini_config:
         DEVELOPMENT: ini_config['Python files']['py_dev'].replace(',', '').split('\n'),
     }
 else:
-    PYTHON_FILES = {}
+    PYTHON_FILES = {
+        PRODUCTION: [],
+        DEVELOPMENT: [],
+    }
 
 if 'Ignored repositories' in ini_config:
     IGNORED_REPOS = ini_config['Ignored repositories']['ignored_repos'].replace(',', '').split('\n')
+else:
+    IGNORED_REPOS = []
