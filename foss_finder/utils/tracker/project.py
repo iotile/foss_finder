@@ -32,6 +32,8 @@ class Project():
 
     def set_user_defined_information(self, data):
         self.user_defined_information = UserDefinedInformation(data)
+        for foss in self.user_defined_information.added_packages():
+            self.add_foss(foss)
 
     def add_foss(self, foss):
         if self.user_defined_information:

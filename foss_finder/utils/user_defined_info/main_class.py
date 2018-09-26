@@ -71,8 +71,16 @@ class UserDefinedInformation():
                             raise ValueError(msg)
                     package_version_list.append(package_version)
 
-    def process_add_packages(self):
-        raise NotImplementedError
+    def added_packages(self):
+        res = []
+        
+        if self._fields[AddPackages.NAME].data:
+            initial_row = len(DEFAULT_COLUMNS) * ['']
+            for pkg in self._fields[AddPackages.NAME].data:
+                row = self._fields[AddPackages.NAME].process(pkg[PACKAGE], pkg[VERSION], initial_row)
+                res.append(row)
+        
+        return res
 
     def process_package(self, package, version, row):
         if self._fields[Overwrites.NAME].data:
