@@ -1,1 +1,1 @@
-from .tracker import FossTracker
+from .main_class import FossTracker

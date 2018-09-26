@@ -56,6 +56,9 @@ else:
 # Now, define variables that are not related to the INI configuration file #
 ############################################################################
 
+# Name of the user-defined information file
+USER_DEFINED_INFORMATION_FILE = '.foss.json'
+
 # Default columns of the CSV files (ordered)
 DEFAULT_COLUMNS = [
     REGISTRY,

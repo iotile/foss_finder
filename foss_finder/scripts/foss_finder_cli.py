@@ -9,9 +9,9 @@ import getpass
 
 from github import Github, GithubException
 
-from ..utils.parsers import NpmPackageParser, PyPiRequirementParser
-from ..utils.tracker import FossTracker
-from ..config import strings, config
+from utils.parsers import NpmPackageParser, PyPiRequirementParser
+from utils.tracker import FossTracker
+from config import strings, config
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +25,9 @@ def get_dir_content(repo, path, output_path, tracker, npm_sections, npm_depth, p
     # The repository may be empty
     except GithubException:
         return None
+
+    if config.USER_DEFINED_INFORMATION_FILE in files:
+        tracker.add_user_defined_information_to_project(repo.name)
 
     for file in files:
         full_path_name = os.path.join(path, file.name)
@@ -43,7 +46,7 @@ def get_dir_content(repo, path, output_path, tracker, npm_sections, npm_depth, p
                         logger.debug(f'Info: {info[0]}')
                         for pkg_info in info:
                             if strings.ERROR not in pkg_info:
-                                tracker.add_foss_to_project(repo.name, [pkg_info.get(f) for f in config.FIELDS])
+                                tracker.add_foss_to_project(repo.name, [pkg_info.get(f) for f in config.DEFAULT_COLUMNS])
 
         if any([name in full_path_name for name in python_files]):
             logger.info(f'Found {full_path_name} ({file.type})')
@@ -56,7 +59,7 @@ def get_dir_content(repo, path, output_path, tracker, npm_sections, npm_depth, p
                 info = PyPiRequirementParser.parse_line(line)
                 logger.debug(f'Info: {info}')
                 if strings.ERROR not in info:
-                    tracker.add_foss_to_project(repo.name, [info.get(f) for f in config.FIELDS])
+                    tracker.add_foss_to_project(repo.name, [info.get(f) for f in config.DEFAULT_COLUMNS])
 
         if str(file.type) == 'dir':
             get_dir_content(repo, os.path.join(path, file.name), output_path, tracker, npm_sections, npm_depth, python_files)
@@ -67,7 +70,7 @@ def process_project(repo, tracker, outdir, npm_sections, npm_depth, python_files
     os.makedirs(outdir, exist_ok=True)
     tracker.add_project(repo.name)
     get_dir_content(repo, '/', output_path, tracker, npm_sections, npm_depth, python_files)
-    tracker.write_project_csv(repo.name, config.FIELDS, output_path)
+    tracker.write_project_csv(repo.name, config.DEFAULT_COLUMNS, output_path)
 
 
 def build_parser():
