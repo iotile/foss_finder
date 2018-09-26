@@ -1,5 +1,5 @@
-from config.config import DEFAULT_COLUMNS, OPTIONAL_COLUMNS
-from config.strings import ADDITIONAL_INFO_NAME
+from foss_finder.config.config import DEFAULT_COLUMNS, OPTIONAL_COLUMNS
+from foss_finder.config.strings import ADDITIONAL_INFO_NAME
 
 from .field import UserDefinedInformationField
 

@@ -9,9 +9,9 @@ import getpass
 
 from github import Github, GithubException
 
-from utils.parsers import NpmPackageParser, PyPiRequirementParser
-from utils.tracker import FossTracker
-from config import strings, config
+from ..utils.parsers import NpmPackageParser, PyPiRequirementParser
+from ..utils.tracker import FossTracker
+from ..config import strings, config
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +26,8 @@ def get_dir_content(repo, path, output_path, tracker, npm_sections, npm_depth, p
     except GithubException:
         return None
 
-    if config.USER_DEFINED_INFORMATION_FILE in files:
-        tracker.add_user_defined_information_to_project(repo.name)
+    if config.USER_DEFINED_INFORMATION_FILE in [file.name for file in files]:
+        logger.debug('HELLO')
 
     for file in files:
         full_path_name = os.path.join(path, file.name)

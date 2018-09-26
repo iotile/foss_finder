@@ -1,5 +1,5 @@
-from config.config import DEFAULT_COLUMNS
-from config.strings import OVERWRITES_NAME
+from foss_finder.config.config import DEFAULT_COLUMNS
+from foss_finder.config.strings import OVERWRITES_NAME
 
 from .field import UserDefinedInformationField
 

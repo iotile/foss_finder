@@ -1,5 +1,5 @@
-from config.config import USER_DEFINED_INFORMATION_FIELDS
-from config.strings import *
+from foss_finder.config.config import USER_DEFINED_INFORMATION_FIELDS
+from foss_finder.config.strings import *
 
 
 class UserDefinedInformationField():

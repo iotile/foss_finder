@@ -1,4 +1,4 @@
-from utils.user_defined_info import UserDefinedInformation
+from ..user_defined_info import UserDefinedInformation
 
 
 class Project():

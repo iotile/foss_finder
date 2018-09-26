@@ -1,4 +1,4 @@
-from config.strings import ADD_PACKAGE_NAME
+from foss_finder.config.strings import ADD_PACKAGE_NAME
 
 from .field import UserDefinedInformationField
 

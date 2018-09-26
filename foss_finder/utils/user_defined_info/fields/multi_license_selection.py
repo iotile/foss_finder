@@ -1,7 +1,7 @@
 import re
 
-from config.strings import *
-from config.config import DEFAULT_COLUMNS
+from foss_finder.config.strings import *
+from foss_finder.config.config import DEFAULT_COLUMNS
 
 from .field import UserDefinedInformationField
 

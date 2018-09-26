@@ -1,8 +1,8 @@
 import json
 import sys
 
-from config.config import DEFAULT_COLUMNS, OPTIONAL_COLUMNS
-from config.strings import *
+from foss_finder.config.config import DEFAULT_COLUMNS, OPTIONAL_COLUMNS
+from foss_finder.config.strings import *
 
 from .fields import AddPackages, Overwrites, MultiLicenseSelection, AdditionalInfo
 

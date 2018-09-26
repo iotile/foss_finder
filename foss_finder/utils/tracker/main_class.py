@@ -1,4 +1,4 @@
-from utils.csv import write_new_row
+from foss_finder.utils.csv import write_new_row
 
 from .project import Project
 
@@ -26,7 +26,7 @@ class FossTracker():
             self.processed_projects[project_name] = Project(project_name)
     
     def add_user_defined_information_to_project(self, project_name):
-        print(f'HELLO {project_name}')
+        self.processed_projects[project_name].add_user_defined_information(project_name)
 
     def add_foss_to_project(self, project_name, foss):
         self.processed_projects[project_name].add_foss(foss)
