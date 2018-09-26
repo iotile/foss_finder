@@ -1,1 +1,1 @@
-from .main_class import UserDefinedInformation
+from .base import UserDefinedInformation

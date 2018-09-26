@@ -3,6 +3,11 @@ from foss_finder.config.strings import *
 
 
 class UserDefinedInformationField():
+    """
+    Abstract class to implement the fields of the user-defined information file.
+    A field of the user-defined information file is meant to contain an array of
+    packages whose information must be added, completed, or modified.
+    """
     # must be defined by the derived class
     NAME = None
 

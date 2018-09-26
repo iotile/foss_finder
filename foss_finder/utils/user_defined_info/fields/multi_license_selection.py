@@ -7,6 +7,11 @@ from .field import UserDefinedInformationField
 
 
 class MultiLicenseSelection(UserDefinedInformationField):
+    """
+    Implements a field of the user-defined information file.
+    This field's purpose is to select a license from a multi-license.
+    In other words, choose the license that is used when the package is multi-licensed.
+    """
     NAME = MULTI_LICENSE_SELECTION_NAME
 
     def __init__(self, data, *args, **kwargs):

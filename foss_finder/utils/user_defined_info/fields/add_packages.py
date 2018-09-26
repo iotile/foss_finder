@@ -5,6 +5,11 @@ from .field import UserDefinedInformationField
 
 
 class AddPackages(UserDefinedInformationField):
+    """
+    Implements a field of the user-defined information file.
+    This field's purpose is to add dependencies to a project.
+    In other words, add information about packages that could not be found by foss_finder.
+    """
     NAME = ADD_PACKAGE_NAME
 
     def __init__(self, data, *args, **kwargs):

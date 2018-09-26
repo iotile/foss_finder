@@ -56,9 +56,6 @@ else:
 # Now, define variables that are not related to the INI configuration file #
 ############################################################################
 
-# Name of the user-defined information file (it must be at the root of a repository)
-USER_DEFINED_INFORMATION_NAME = '.foss.json'
-
 # Default columns of the CSV files (ordered)
 DEFAULT_COLUMNS = [
     REGISTRY,
@@ -67,6 +64,9 @@ DEFAULT_COLUMNS = [
     VERSION,
     URL,
 ]
+
+# Name of the user-defined information file (it must be at the root of a repository)
+USER_DEFINED_INFORMATION_NAME = '.foss.json'
 
 # Fields of the user-defined information file with their required and optional attributes
 USER_DEFINED_INFORMATION_FIELDS = {

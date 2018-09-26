@@ -5,6 +5,9 @@ from ..user_defined_info import UserDefinedInformation
 
 
 class Project():
+    """
+    Represents a project. Stores the list of its dependencies.
+    """
 
     def __init__(self, name):
         self.name = name

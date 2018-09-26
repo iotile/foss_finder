@@ -4,6 +4,10 @@ from .project import Project
 
 
 class FossTracker():
+    """
+    Tracks a set of projects along with their dependencies.
+    """
+
     def __init__(self):
         # Maps the name of a project to a Project object
         self.processed_projects = {}

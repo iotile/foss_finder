@@ -8,6 +8,12 @@ from .fields import AddPackages, Overwrites, MultiLicenseSelection, AdditionalIn
 
 
 class UserDefinedInformation():
+    """
+    Initialized from json data. It processes the data to update dependencies' information.
+    - Checks if the data is correct.
+    - Creates a list of rows to add to the csv file.
+    - Modifies the row representing a package to add or overwrite information.
+    """
 
     def __init__(self, data):
         for column in (PACKAGE, VERSION, LICENSE):
@@ -72,6 +78,9 @@ class UserDefinedInformation():
                     package_version_list.append(package_version)
 
     def added_packages(self):
+        """
+        Creates rows to add to the csv file (packages added by the user).
+        """
         res = []
         
         if self._fields[AddPackages.NAME].data:
@@ -83,6 +92,9 @@ class UserDefinedInformation():
         return res
 
     def process_package(self, package, version, row):
+        """
+        Modifies the row representing a package to add or overwrite information.
+        """
         if self._fields[Overwrites.NAME].data:
             row = self._fields[Overwrites.NAME].process(package, version, row)
         

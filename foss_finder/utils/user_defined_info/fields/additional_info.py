@@ -5,6 +5,11 @@ from .field import UserDefinedInformationField
 
 
 class AdditionalInfo(UserDefinedInformationField):
+    """
+    Implements a field of the user-defined information file.
+    This field's purpose is to add information about a dependency.
+    In other words, fill optional columns (provided in the INI file) for a given package.
+    """
     NAME = ADDITIONAL_INFO_NAME
 
     def _transform_row(self, row, package_info):

@@ -5,6 +5,11 @@ from .field import UserDefinedInformationField
 
 
 class Overwrites(UserDefinedInformationField):
+    """
+    Implements a field of the user-defined information file.
+    This field's purpose is to overwrite information about a dependency.
+    In other words, modify the information given by foss_finder because it is incorrect.
+    """
     NAME = OVERWRITES_NAME
 
     def _transform_row(self, row, package_info):
