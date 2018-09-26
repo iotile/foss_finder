@@ -1,1 +1,1 @@
-from .main_class import AdditionalInformation
+from .main_class import UserDefinedInformation
