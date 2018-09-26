@@ -9,11 +9,12 @@ from config.strings import *
 
 class UserDefinedInformation():
 
-    def __init__(self, file):
+    def __init__(self, filename):
         for column in (PACKAGE, VERSION, LICENSE):
             assert column in DEFAULT_COLUMNS
 
-        data = json.load(file)
+        with open(filename) as f:
+            data = json.load(f)
 
         self._fields = {
             AddPackages.NAME: AddPackages(None),
