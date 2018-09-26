@@ -25,16 +25,16 @@ class FossTracker():
         if project_name not in self.processed_projects:
             self.processed_projects[project_name] = Project(project_name)
     
-    def add_user_defined_information_to_project(self, project_name):
-        self.processed_projects[project_name].add_user_defined_information(project_name)
+    def add_user_defined_information_to_project(self, project_name, data):
+        self.processed_projects[project_name].set_user_defined_information(data)
 
     def add_foss_to_project(self, project_name, foss):
         self.processed_projects[project_name].add_foss(foss)
 
-    def write_project_csv(self, project_name, fields, filename):
-        write_new_row(filename, fields)
-        list_of_foss = self.processed_projects[project_name].list_of_foss
-        for foss in list_of_foss:
+    def write_project_csv(self, project_name, filename):
+        project = self.processed_projects[project_name]
+        write_new_row(filename, project.columns)
+        for foss in project.list_of_foss:
             write_new_row(filename, foss)
 
     def report_project_summary(self, project_name):

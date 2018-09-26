@@ -9,7 +9,8 @@ class UserDefinedInformationField():
     def __init__(self, data):
         self.data = data
         self.required_fields, self.optional_fields = USER_DEFINED_INFORMATION_FIELDS[self.NAME]
-    
+        self._package_info_useless_keys = (PACKAGE, VERSION, OWNER, REASON)
+
     def _find_package_info(self, package, version):
         # Look for an object in data matching the package and version
         # The object's 'package' field must equal package
@@ -20,7 +21,7 @@ class UserDefinedInformationField():
 
         assert len(query) == 1
         package_info = query[0].copy()
-        for useless_key in (PACKAGE, VERSION, OWNER, REASON):
+        for useless_key in self._package_info_useless_keys:
             package_info.pop(useless_key, None)
         return package_info
     

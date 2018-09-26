@@ -9,12 +9,9 @@ from .fields import AddPackages, Overwrites, MultiLicenseSelection, AdditionalIn
 
 class UserDefinedInformation():
 
-    def __init__(self, filename):
+    def __init__(self, data):
         for column in (PACKAGE, VERSION, LICENSE):
             assert column in DEFAULT_COLUMNS
-
-        with open(filename) as f:
-            data = json.load(f)
 
         self._fields = {
             AddPackages.NAME: AddPackages(None),
