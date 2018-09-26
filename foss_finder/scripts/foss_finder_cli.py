@@ -33,17 +33,13 @@ def get_dir_content(repo, path, output_path, tracker, npm_sections, npm_depth, p
             file_content = repo.get_file_contents(full_path_name)
             decoded_file = base64.b64decode(file_content.content)
             data = json.loads(decoded_file)
-            ### DEBUG PURPOSE
-            with open('/users/cdupret/Software/archway/.foss.json') as f:
-                data = json.load(f)
-            # data = {}
+            logger.debug(f'Found the following data: {data}')
             tracker.add_user_defined_information_to_project(repo.name, data)
-            logger.debug(data)
         # If no user-defined information file is found, we still want to process packages to add empty columns
         else:
+            logger.debug(f'No user-defined information file was found')
             data = {}
             tracker.add_user_defined_information_to_project(repo.name, data)
-            logger.debug(data)
 
     for file in files:
         full_path_name = os.path.join(path, file.name)
