@@ -100,6 +100,11 @@ def main():
     if args.debug:
         logger.setLevel(logging.DEBUG)
 
+    logger.debug(f'Config: use semver? {config.USE_SEMVER}')
+    logger.debug(f'Config: NPM sections: {config.NPM_SECTIONS}')
+    logger.debug(f'Config: Python files: {config.PYTHON_FILES}')
+    logger.debug(f'Config: ignored repositories: {config.IGNORED_REPOS}')
+
     # NPM sections and Python files
     npm_sections = config.NPM_SECTIONS[strings.PRODUCTION]
     python_files = config.PYTHON_FILES[strings.PRODUCTION]
