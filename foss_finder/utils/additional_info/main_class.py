@@ -1,10 +1,10 @@
 import json
 import sys
 
-from .fields import AddPackages, Overwrites, MultiLicenseSelection, AdditionalInfo, DEFAULT_COLUMNS, OPTIONAL_COLUMNS
-
-from config import config
+from config.config import DEFAULT_COLUMNS, OPTIONAL_COLUMNS
 from config.strings import *
+
+from .fields import AddPackages, Overwrites, MultiLicenseSelection, AdditionalInfo
 
 
 class UserDefinedInformation():

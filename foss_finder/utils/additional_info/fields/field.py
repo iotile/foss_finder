@@ -1,5 +1,4 @@
-from .config import USER_DEFINED_INFORMATION_FIELDS
-
+from config.config import USER_DEFINED_INFORMATION_FIELDS
 from config.strings import *
 
 

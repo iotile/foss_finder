@@ -1,9 +1,9 @@
 import re
 
-from .field import UserDefinedInformationField
-from .config import MULTI_LICENSE_SELECTION_NAME, DEFAULT_COLUMNS
-
 from config.strings import *
+from config.config import DEFAULT_COLUMNS
+
+from .field import UserDefinedInformationField
 
 
 class MultiLicenseSelection(UserDefinedInformationField):

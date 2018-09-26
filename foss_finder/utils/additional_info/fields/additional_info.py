@@ -1,6 +1,8 @@
+from config.config import DEFAULT_COLUMNS, OPTIONAL_COLUMNS
+from config.strings import ADDITIONAL_INFO_NAME
+
 from .field import UserDefinedInformationField
 
-from .config import ADDITIONAL_INFO_NAME, DEFAULT_COLUMNS, OPTIONAL_COLUMNS
 
 class AdditionalInfo(UserDefinedInformationField):
     NAME = ADDITIONAL_INFO_NAME

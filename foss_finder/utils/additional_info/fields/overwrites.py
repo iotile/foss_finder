@@ -1,6 +1,8 @@
+from config.config import DEFAULT_COLUMNS
+from config.strings import OVERWRITES_NAME
+
 from .field import UserDefinedInformationField
 
-from .config import OVERWRITES_NAME, DEFAULT_COLUMNS
 
 class Overwrites(UserDefinedInformationField):
     NAME = OVERWRITES_NAME
