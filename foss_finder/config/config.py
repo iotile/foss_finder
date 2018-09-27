@@ -65,8 +65,11 @@ DEFAULT_COLUMNS = [
     URL,
 ]
 
-# Name of the user-defined information file (it must be at the root of a repository)
+# Name of the local user-defined information file (must be at the root of a repository)
 USER_DEFINED_INFORMATION_NAME = '.foss.json'
+
+# Name of the global user-defined information file (must be in the folder where you run the script)
+GLOBAL_USER_DEFINED_INFORMATION_NAME = '.foss.global.json'
 
 # Fields of the user-defined information file with their required and optional attributes
 USER_DEFINED_INFORMATION_FIELDS = {

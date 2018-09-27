@@ -9,10 +9,11 @@ class Project():
     Represents a project. Stores the list of its dependencies.
     """
 
-    def __init__(self, name):
+    def __init__(self, name, global_user_defined_information):
         self.name = name
-        self.list_of_foss = []
+        self.global_user_defined_information = global_user_defined_information
         self.user_defined_information = None
+        self.list_of_foss = []
 
     @property
     def number_of_foss(self):
@@ -33,8 +34,8 @@ class Project():
             f'Number of open source projects found: {self.number_of_foss}',
         ]
 
-    def set_user_defined_information(self, data):
-        self.user_defined_information = UserDefinedInformation(data)
+    def set_user_defined_information(self, local_data):
+        self.user_defined_information = UserDefinedInformation(local_data, self.global_user_defined_information)
         for foss in self.user_defined_information.added_packages():
             self.add_foss(foss)
 
