@@ -26,6 +26,21 @@ def get_dir_content(repo, path, output_path, tracker, npm_sections, npm_depth, p
     except GithubException:
         return None
 
+    if path == '/':
+        if config.USER_DEFINED_INFORMATION_NAME in [file.name for file in files]:
+            full_path_name = os.path.join(path, config.USER_DEFINED_INFORMATION_NAME)
+            logger.info(f'Found {full_path_name} (user-defined information file)')
+            file_content = repo.get_file_contents(full_path_name)
+            decoded_file = base64.b64decode(file_content.content)
+            data = json.loads(decoded_file)
+            logger.debug(f'Found the following data: {data}')
+            tracker.add_user_defined_information_to_project(repo.name, data)
+        # If no user-defined information file is found, we still want to process packages to add empty columns
+        else:
+            logger.debug(f'No user-defined information file was found')
+            data = {}
+            tracker.add_user_defined_information_to_project(repo.name, data)
+
     for file in files:
         full_path_name = os.path.join(path, file.name)
         if os.path.basename(file.name) in ['package.json', 'bower.json']:
@@ -43,7 +58,7 @@ def get_dir_content(repo, path, output_path, tracker, npm_sections, npm_depth, p
                         logger.debug(f'Info: {info[0]}')
                         for pkg_info in info:
                             if strings.ERROR not in pkg_info:
-                                tracker.add_foss_to_project(repo.name, [pkg_info.get(f) for f in config.FIELDS])
+                                tracker.add_foss_to_project(repo.name, [pkg_info.get(f) for f in config.DEFAULT_COLUMNS])
 
         if any([name in full_path_name for name in python_files]):
             logger.info(f'Found {full_path_name} ({file.type})')
@@ -56,7 +71,7 @@ def get_dir_content(repo, path, output_path, tracker, npm_sections, npm_depth, p
                 info = PyPiRequirementParser.parse_line(line)
                 logger.debug(f'Info: {info}')
                 if strings.ERROR not in info:
-                    tracker.add_foss_to_project(repo.name, [info.get(f) for f in config.FIELDS])
+                    tracker.add_foss_to_project(repo.name, [info.get(f) for f in config.DEFAULT_COLUMNS])
 
         if str(file.type) == 'dir':
             get_dir_content(repo, os.path.join(path, file.name), output_path, tracker, npm_sections, npm_depth, python_files)
@@ -67,7 +82,7 @@ def process_project(repo, tracker, outdir, npm_sections, npm_depth, python_files
     os.makedirs(outdir, exist_ok=True)
     tracker.add_project(repo.name)
     get_dir_content(repo, '/', output_path, tracker, npm_sections, npm_depth, python_files)
-    tracker.write_project_csv(repo.name, config.FIELDS, output_path)
+    tracker.write_project_csv(repo.name, output_path)
 
 
 def build_parser():

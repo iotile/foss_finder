@@ -1,3 +1,9 @@
+[User defined information]
+# Optional columns that are added to the CSV files by using a repository's .foss.json
+optional_columns=column1,
+    column2,
+    column3
+
 [NPM parser]
 # Requires NodeJS and NPM
 use_semver=false

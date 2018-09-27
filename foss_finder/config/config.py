@@ -1,15 +1,11 @@
 import configparser
 
-from .strings import * 
+from .strings import *
 
-# Fields of the CSV files (ordered)
-FIELDS = [
-    REGISTRY,
-    PACKAGE,
-    LICENSE,
-    VERSION,
-    URL,
-]
+
+###############################################################
+# First, define variables by using the INI configuration file #
+###############################################################
 
 # Path of the INI configuration file (relative to the root of foss_finder)
 INI_PATH = '.foss_finder'
@@ -17,7 +13,13 @@ INI_PATH = '.foss_finder'
 # Processing of the INI configuration file
 ini_config = configparser.ConfigParser()
 ini_config.read(INI_PATH)
+
 # Exposed variables
+if 'User defined information' in ini_config:
+    OPTIONAL_COLUMNS = ini_config['User defined information']['optional_columns'].replace(',', '').split('\n')
+else:
+    OPTIONAL_COLUMNS = []
+
 if 'NPM parser' in ini_config:
     USE_SEMVER = ini_config['NPM parser'].getboolean('use_semver')
 else:
@@ -49,3 +51,63 @@ if 'Ignored repositories' in ini_config:
     IGNORED_REPOS = ini_config['Ignored repositories']['ignored_repos'].replace(',', '').split('\n')
 else:
     IGNORED_REPOS = []
+
+############################################################################
+# Now, define variables that are not related to the INI configuration file #
+############################################################################
+
+# Default columns of the CSV files (ordered)
+DEFAULT_COLUMNS = [
+    REGISTRY,
+    PACKAGE,
+    LICENSE,
+    VERSION,
+    URL,
+]
+
+# Name of the user-defined information file (it must be at the root of a repository)
+USER_DEFINED_INFORMATION_NAME = '.foss.json'
+
+# Fields of the user-defined information file with their required and optional attributes
+USER_DEFINED_INFORMATION_FIELDS = {
+    ADD_PACKAGE_NAME: (
+        # required
+        [
+            PACKAGE,
+            VERSION,
+            LICENSE,
+            OWNER,
+        ],
+        # optional
+        DEFAULT_COLUMNS,
+    ),
+    OVERWRITES_NAME: (
+        # required
+        [
+            PACKAGE,
+            OWNER,
+            REASON,
+        ],
+        # optional
+        [VERSION] + DEFAULT_COLUMNS,
+    ),
+    MULTI_LICENSE_SELECTION_NAME: (
+        # required
+        [
+            PACKAGE,
+            OWNER,
+            MULTI_LICENSE_SELECTION,
+        ],
+        # optional
+        [VERSION],
+    ),
+    ADDITIONAL_INFO_NAME: (
+        # required
+        [
+            PACKAGE,
+            OWNER,
+        ],
+        # optional
+        [VERSION] + OPTIONAL_COLUMNS,
+    ),
+}
