@@ -9,7 +9,7 @@ class FossTracker():
     Tracks a set of projects along with their dependencies.
     """
 
-    def __init__(self, global_user_defined_information):
+    def __init__(self, global_user_defined_information={}):
         # validate global data only one time
         UserDefinedInformation.validate_data(global_user_defined_information)
         self.global_user_defined_information = global_user_defined_information
