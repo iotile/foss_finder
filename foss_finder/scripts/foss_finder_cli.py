@@ -156,6 +156,7 @@ def main():
         logger.debug(f'No global user-defined information file was found')
 
     tracker = FossTracker(global_user_defined_information=global_user_defined_information)
+    logger.debug(f'The following validators are used: {tracker.validators}')
 
     if args.project:
         repo = organization.get_repo(args.project)

@@ -27,6 +27,10 @@ py_dev=/requirements-build.txt,
     /requirements/development.txt,
     /requirements/docker.txt
 
+[Checks]
+# Validators which must check the information of dependencies is compliant to your policies
+validators=
+
 [Ignored repositories]
 # Names of repositories that should be ignored
 ignored_repos=Foo,

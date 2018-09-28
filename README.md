@@ -60,7 +60,13 @@ The main config file for the script is `/config/config.py` but you shouldn't hav
 
 The `INI_PATH` value defines the path of the INI configuration file, which is the file you want to change to get the script doing what you want.
 
-By default, this INI configuration file is named *.foss_finder*. It contains five sections and several keys.  
+By default, this INI configuration file is named *.foss_finder*. It contains six different sections and several keys. If a key is meant to be a list and you want the list to be empty, you can use the following syntax:
+```
+[Section]
+key=
+```
+You can remove sections, but don't remove required keys from sections.
+
 When using the CLI, make sure you have the INI configuration file in the same directory as the one where you run the commands. The next paragraphs will explain what are the sections of the INI configurastion file.
 
 **_NB:_** `/config/config.py` also defines other values that you can't change in the INI configuration file, such as `DEFAULT_COLUMNS`, `USER_DEFINED_INFORMATION_NAME`, `GLOBAL_USER_DEFINED_INFORMATION_NAME`, and `USER_DEFINED_INFORMATION_FIELDS`. There is no reason for a user to change these values.
@@ -82,6 +88,14 @@ The keys define the sections that are looked for inside _package.json_ and _bowe
 
 The keys define the files that are looked for (Python dependencies). `py_prod` corresponds to the production files and `py_dev` corresponds to the development files.  
 The files that are looked for are those whose name contains the name of one of the files defined here. For instance, if `py_prod` contains _/requirements.txt_, then the following files will match: _/requirements.txt_, _/somefolder/requirements.txt_. So, be careful to include the '/' because if it contained _requirements.txt_, then _dev_requirements.txt_ would match!
+
+#### Checks
+
+You may want to validate the information of your dependencies and exit the script with an error if the information is not valid (for example if you want to use foss_finder as a tool for Continuous Integration).  
+`validators` is the list of validators that are used to check the information of your dependencies. They raise an error when a package doesn't pass the check.
+
+There is currently one validator you can use:
+- **gpl_forbidden**: checks that your dependencies are not licensed under a GPL-like license.
 
 #### Ignored repositories
 
@@ -186,8 +200,11 @@ foss_finder
 │   ├── tracker            -> a tracker should keep track of the info of packages and other stats
 │   │   ├── tracker.py     -> class implementing a tracker to keep info and stats for projects
 │   │   └── project.py     -> class implementing a project and its operations: add packages, etc.
-│   └── user_defined_info  -> contains classes and functions to support user-defined information (UDI)
-│       ├── fields         -> contains classes implementing the supported fields of the UDI file
-│       └── base.py        -> class to process fields, validate data of the UDI file, etc.
+│   ├── user_defined_info  -> contains classes and functions to support user-defined information (UDI)
+│   │   ├── fields         -> contains classes implementing the supported fields of the UDI file
+│   │   └── base.py        -> class to process fields, validate data of the UDI file, etc.
+│   └── validators         -> validators raise exceptions when a package's info doesn't pass a check
+│       ├── base.py        -> abstract class for checks and base class for check exceptions
+│       └── gpl_check.py   -> check that a package is not licensed under a GPL-like license
 └── .foss_finder           -> INI configuration file that should be modified by the user
 ```
