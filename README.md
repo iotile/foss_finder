@@ -200,8 +200,11 @@ foss_finder
 │   ├── tracker            -> a tracker should keep track of the info of packages and other stats
 │   │   ├── tracker.py     -> class implementing a tracker to keep info and stats for projects
 │   │   └── project.py     -> class implementing a project and its operations: add packages, etc.
-│   └── user_defined_info  -> contains classes and functions to support user-defined information (UDI)
-│       ├── fields         -> contains classes implementing the supported fields of the UDI file
-│       └── base.py        -> class to process fields, validate data of the UDI file, etc.
+│   ├── user_defined_info  -> contains classes and functions to support user-defined information (UDI)
+│   │   ├── fields         -> contains classes implementing the supported fields of the UDI file
+│   │   └── base.py        -> class to process fields, validate data of the UDI file, etc.
+│   └── validators         -> validators raise exceptions when a package's info doesn't pass a check
+│       ├── base.py        -> abstract class for checks and base class for check exceptions
+│       └── gpl_check.py   -> check that a package is not licensed under a GPL-like license
 └── .foss_finder           -> INI configuration file that should be modified by the user
 ```
