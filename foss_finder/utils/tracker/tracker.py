@@ -1,3 +1,4 @@
+from foss_finder.config.config import VALIDATORS, VALIDATORS_MAP
 from foss_finder.utils.user_defined_info import UserDefinedInformation
 from foss_finder.utils.csv import write_new_row, remove_file
 
@@ -13,6 +14,8 @@ class FossTracker():
         # validate global data only one time
         UserDefinedInformation.validate_data(global_user_defined_information)
         self.global_user_defined_information = global_user_defined_information
+        # instantiate the validators
+        self.validators = [VALIDATORS_MAP[v]() for v in VALIDATORS]
         # Maps the name of a project to a Project object
         self.processed_projects = {}
     
@@ -31,7 +34,7 @@ class FossTracker():
 
     def add_project(self, project_name):
         if project_name not in self.processed_projects:
-            self.processed_projects[project_name] = Project(project_name, self.global_user_defined_information)
+            self.processed_projects[project_name] = Project(project_name, self.global_user_defined_information, self.validators)
     
     def add_user_defined_information_to_project(self, project_name, data):
         self.processed_projects[project_name].set_user_defined_information(data)

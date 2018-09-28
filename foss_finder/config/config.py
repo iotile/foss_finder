@@ -1,5 +1,7 @@
 import configparser
 
+import foss_finder.utils.validators
+
 from .strings import *
 
 
@@ -14,9 +16,16 @@ INI_PATH = '.foss_finder'
 ini_config = configparser.ConfigParser()
 ini_config.read(INI_PATH)
 
+# Define function to clean data from INI configuration file
+def clean(data):
+    if data:
+        return data.replace(',', '').split('\n')
+    else:
+        return []
+
 # Exposed variables
 if 'User defined information' in ini_config:
-    OPTIONAL_COLUMNS = ini_config['User defined information']['optional_columns'].replace(',', '').split('\n')
+    OPTIONAL_COLUMNS = clean(ini_config['User defined information']['optional_columns'])
 else:
     OPTIONAL_COLUMNS = []
 
@@ -27,8 +36,8 @@ else:
 
 if 'NPM sections' in ini_config:
     NPM_SECTIONS = {
-        PRODUCTION: ini_config['NPM sections']['npm_prod'].replace(',', '').split('\n'),
-        DEVELOPMENT: ini_config['NPM sections']['npm_dev'].replace(',', '').split('\n'),
+        PRODUCTION: clean(ini_config['NPM sections']['npm_prod']),
+        DEVELOPMENT: clean(ini_config['NPM sections']['npm_dev']),
     }
 else:
     NPM_SECTIONS = {
@@ -38,8 +47,8 @@ else:
 
 if 'Python files' in ini_config:
     PYTHON_FILES = {
-        PRODUCTION: ini_config['Python files']['py_prod'].replace(',', '').split('\n'),
-        DEVELOPMENT: ini_config['Python files']['py_dev'].replace(',', '').split('\n'),
+        PRODUCTION: clean(ini_config['Python files']['py_prod']),
+        DEVELOPMENT: clean(ini_config['Python files']['py_dev']),
     }
 else:
     PYTHON_FILES = {
@@ -47,10 +56,16 @@ else:
         DEVELOPMENT: [],
     }
 
+if 'Checks' in ini_config:
+    VALIDATORS = clean(ini_config['Checks']['validators'])
+else:
+    VALIDATORS = []
+
 if 'Ignored repositories' in ini_config:
-    IGNORED_REPOS = ini_config['Ignored repositories']['ignored_repos'].replace(',', '').split('\n')
+    IGNORED_REPOS = clean(ini_config['Ignored repositories']['ignored_repos'])
 else:
     IGNORED_REPOS = []
+
 
 ############################################################################
 # Now, define variables that are not related to the INI configuration file #
@@ -113,4 +128,10 @@ USER_DEFINED_INFORMATION_FIELDS = {
         # optional
         [VERSION] + OPTIONAL_COLUMNS,
     ),
+}
+
+# Maps validator keys to the actual check classes
+
+VALIDATORS_MAP = {
+    GPL_CHECK: foss_finder.utils.validators.GPLCheck,
 }
