@@ -9,8 +9,6 @@ class PyPiRequirementParser(object):
 
     @classmethod
     def get_package_info(cls, name, depth, version=None):
-        print(depth)
-        print(name)
         url = 'https://pypi.python.org/pypi/{}/'.format(name)
         if version:
             url += '{}/'.format(version)
