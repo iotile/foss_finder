@@ -1,5 +1,15 @@
 import csv
+import os
+import errno
 
+
+def remove_file(filename):
+    try:
+        os.remove(filename)
+    except OSError as e:
+        # errno.ENOENT = no such file or directory
+        if e.errno != errno.ENOENT:
+            raise
 
 def write_new_row(filename, row):
     # row is a list of strings

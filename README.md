@@ -172,7 +172,7 @@ It is possible to have conflicts between _.foss.global.json_ and a given _.foss.
 
 ```
 foss_finder
-├── config
+├── config                 -> global config folder of the script
 │   ├── config.py          -> get variables from INI config file and define other variables
 │   └── strings.py         -> strings that are used in many locations in the code
 ├── scripts                -> entry point

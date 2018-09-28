@@ -1,5 +1,5 @@
-from foss_finder.utils.csv import write_new_row
 from foss_finder.utils.user_defined_info import UserDefinedInformation
+from foss_finder.utils.csv import write_new_row, remove_file
 
 from .project import Project
 
@@ -41,6 +41,7 @@ class FossTracker():
 
     def write_project_csv(self, project_name, filename):
         project = self.processed_projects[project_name]
+        remove_file(filename)
         write_new_row(filename, project.columns)
         for foss in project.list_of_foss:
             write_new_row(filename, foss)
