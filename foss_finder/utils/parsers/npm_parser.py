@@ -42,7 +42,7 @@ class NpmPackageParser(object):
             package_info = json.loads(resp.content.decode())
             package_version = None
             for version in list(package_info['versions'].keys())[::-1]:
-                if NpmPackageParser.satisfies(version, version_spec, use_semver=use_semver):
+                if cls.satisfies(version, version_spec, use_semver=use_semver):
                     package_version = version
                     break
             if package_version is None:
@@ -68,7 +68,7 @@ class NpmPackageParser(object):
                     if section in package_info_version:
                         for dep_name in package_info_version[section].keys():
                             dep_version = package_info_version[section][dep_name]
-                            dep_info = NpmPackageParser.get_package_info(
+                            dep_info = cls.get_package_info(
                                 dep_name.lower(), dep_version, depth-1, npm_sections, use_semver=use_semver
                             )
                             # update info with no duplicate
