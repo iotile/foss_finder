@@ -6,14 +6,14 @@ A Python script to look for the dependencies used in the repositories of a GitHu
 
 When it comes to using Python packages, it is always recommended you use a Python Virtual Env. Using Python 3, you can simply do:
 
-```
+```shell
 python3 -m venv  ~/.virtualenv/foss_finder
 source ~/.virtualenv/foss_finder/bin/activate
 ```
 
 Once the virtual environment is set up, simply install the dependencies with:
 
-```
+```shell
 pip install -U pip
 pip install -U foss_finder
 ```
@@ -24,19 +24,19 @@ pip install -U foss_finder
 
 The script is fairly easy to use but if you need any help, you can run:
 
-```
+```shell
 foss-finder-cli -h
 ```
 
 The standard way to run the script is to get an access token for your GitHub organization, then run:
 
-```
+```shell
 foss-finder-cli -t <your_access_token> <name_of_your_organization>
 ```
 
 Alternatively, you can directly use your GitHub username to login:
 
-```
+```shell
 foss-finder-cli -u <your_username> <name_of_your_organization>
 ```
 
@@ -61,10 +61,12 @@ The main config file for the script is `/config/config.py` but you shouldn't hav
 The `INI_PATH` value defines the path of the INI configuration file, which is the file you want to change to get the script doing what you want.
 
 By default, this INI configuration file is named *.foss_finder*. It contains six different sections and several keys. If a key is meant to be a list and you want the list to be empty, you can use the following syntax:
-```
+
+```ini
 [Section]
 key=
 ```
+
 You can remove sections, but don't remove required keys from sections.
 
 When using the CLI, make sure you have the INI configuration file in the same directory as the one where you run the commands. The next paragraphs will explain what are the sections of the INI configurastion file.
@@ -123,7 +125,7 @@ You can modify the csv file of a repository by adding a configuration file at th
 
 Here is an example of what you can put in this file:
 
-```
+```json
 {
   "overwrites": [
     {
