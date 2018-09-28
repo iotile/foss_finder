@@ -23,3 +23,4 @@ MULTI_LICENSE_SELECTION = 'multi-license-selection'
 
 # Keys for checks
 GPL_CHECK = 'gpl_forbidden'
+MULTI_LICENSE_SELECTION_CHECK = 'multi_license_selection'

@@ -131,7 +131,7 @@ USER_DEFINED_INFORMATION_FIELDS = {
 }
 
 # Maps validator keys to the actual check classes
-
 VALIDATORS_MAP = {
     GPL_CHECK: foss_finder.utils.validators.GPLCheck,
+    MULTI_LICENSE_SELECTION_CHECK: foss_finder.utils.validators.MultiLicenseCheck,
 }

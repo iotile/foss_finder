@@ -94,8 +94,9 @@ The files that are looked for are those whose name contains the name of one of t
 You may want to validate the information of your dependencies and exit the script with an error if the information is not valid (for example if you want to use foss_finder as a tool for Continuous Integration).  
 `validators` is the list of validators that are used to check the information of your dependencies. They raise an error when a package doesn't pass the check.
 
-There is currently one validator you can use:
+There are currently two validators you can use:
 - **gpl_forbidden**: checks that your dependencies are not licensed under a GPL-like license.
+- **multi_license_selection**: checks that you chose a license for your multi-licensed dependencies.
 
 #### Ignored repositories
 
