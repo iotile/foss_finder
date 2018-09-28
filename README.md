@@ -48,6 +48,8 @@ The above commands run the script on all the repositories of the organization. I
 
 By default, the reports are stored in csv format in a directory named _out_. The names of the reports are _<name_of_your_repository>.csv_. You can change the directory where these csv files are saved by adding `-o <relative_path_of_directory>`.
 
+By default, for a given project, the script only looks for the direct dependencies of the project (not the dependencies of the dependencies of the project for example). However, it is possible to look for deep dependencies by adding `--depth <int:depth>`.
+
 By default, the script only looks for production dependencies. If you wish to look for development and build dependencies too, then you can add `--dev`. Production vs development dependencies are defined by the INI configuration file. (See below: _Configuration_.)
 
 Finally, you can add `--debug` to enable debug mode.
