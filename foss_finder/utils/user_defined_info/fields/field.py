@@ -11,17 +11,26 @@ class UserDefinedInformationField():
     # must be defined by the derived class
     NAME = None
 
-    def __init__(self, data):
-        self.data = data
+    def __init__(self, local_data=[], global_data=[]):
+        self.local_data = local_data
+        self.global_data = global_data
         self.required_fields, self.optional_fields = USER_DEFINED_INFORMATION_FIELDS[self.NAME]
         self._package_info_useless_keys = (PACKAGE, VERSION, OWNER, REASON)
 
-    def _find_package_info(self, package, version):
+    @property
+    def has_data(self):
+        return self.local_data or self.global_data
+
+    def _find_package_info(self, package, version, local=True):
         # Look for an object in data matching the package and version
         # The object's 'package' field must equal package
         # The object's 'version' field must equal the version if it is specified
-        query = [p for p in self.data if p[PACKAGE] == package and p.get(VERSION) in (None, version)]
+        data = self.local_data if local and self.local_data else self.global_data
+        query = [p for p in data if p[PACKAGE] == package and p.get(VERSION) in (None, version)]
         if not query:
+            # if the package is not found in local data, look for it in global data
+            if local:
+                return self._find_package_info(package, version, local=False)
             return None
 
         assert len(query) == 1

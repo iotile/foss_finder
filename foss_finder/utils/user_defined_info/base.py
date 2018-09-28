@@ -1,5 +1,6 @@
 import json
 import sys
+import copy
 
 from foss_finder.config.config import DEFAULT_COLUMNS, OPTIONAL_COLUMNS
 from foss_finder.config.strings import *
@@ -14,30 +15,37 @@ class UserDefinedInformation():
     - Creates a list of rows to add to the csv file.
     - Modifies the row representing a package to add or overwrite information.
     """
+    # fields of the class
+    _FIELDS = {
+        AddPackages.NAME: AddPackages(),
+        Overwrites.NAME: Overwrites(),
+        MultiLicenseSelection.NAME: MultiLicenseSelection(),
+        AdditionalInfo.NAME: AdditionalInfo(),
+    }
 
-    def __init__(self, data):
+    def __init__(self, local_data, global_data):
         for column in (PACKAGE, VERSION, LICENSE):
             assert column in DEFAULT_COLUMNS
 
-        self._fields = {
-            AddPackages.NAME: AddPackages(None),
-            Overwrites.NAME: Overwrites(None),
-            MultiLicenseSelection.NAME: MultiLicenseSelection(None),
-            AdditionalInfo.NAME: AdditionalInfo(None),
-        }
-        
-        self._validate_data(data)
-        
-        for key, field in self._fields.items():
-            field.data = data.get(key)
+        # fields of the instance
+        self._fields = copy.deepcopy(self._FIELDS)
 
-    def _validate_data(self, data):
+        self.validate_data(local_data)
+        # assume that global_data has already been validated
+        # we don't want to validate it several times as it is global
+
+        for key, field in self._fields.items():
+            field.local_data = local_data.get(key)
+            field.global_data = global_data.get(key)
+
+    @classmethod
+    def validate_data(cls, data):
         for key, packages in data.items():
-            field = self._fields.get(key)
+            field = cls._FIELDS.get(key)
             # Check if invalid field in the config file
             if field is None:
                 msg = f'Invalid field in .foss.json: {key}.'
-                msg += f' Valid fields are: {", ".join(self._fields.keys)}.'
+                msg += f' Valid fields are: {", ".join(cls._FIELDS.keys)}.'
                 raise ValueError(msg)
             else:
                 required_fields = field.required_fields
@@ -83,27 +91,35 @@ class UserDefinedInformation():
         """
         res = []
         
-        if self._fields[AddPackages.NAME].data:
+        if self._fields[AddPackages.NAME].has_data:
             initial_row = len(DEFAULT_COLUMNS) * ['']
-            for pkg in self._fields[AddPackages.NAME].data:
-                row = self._fields[AddPackages.NAME].process(pkg[PACKAGE], pkg[VERSION], initial_row)
-                res.append(row)
-        
+            if self._fields[AddPackages.NAME].local_data:
+                for pkg in self._fields[AddPackages.NAME].local_data:
+                    row = self._fields[AddPackages.NAME].process(pkg[PACKAGE], pkg[VERSION], initial_row)
+                    res.append(row)
+            # for global data, no need to check that name and version of packages are not in local data
+            # it doesn't create a conflict since local data is checked first in _find_package_info
+            if self._fields[AddPackages.NAME].global_data:
+                for pkg in self._fields[AddPackages.NAME].global_data:
+                    row = self._fields[AddPackages.NAME].process(pkg[PACKAGE], pkg[VERSION], initial_row)
+                    # res can now have duplicates but it doesn't matter because add_foss will drop them
+                    res.append(row)    
+
         return res
 
     def process_package(self, package, version, row):
         """
         Modifies the row representing a package to add or overwrite information.
         """
-        if self._fields[Overwrites.NAME].data:
+        if self._fields[Overwrites.NAME].has_data:
             row = self._fields[Overwrites.NAME].process(package, version, row)
         
         row.append('')
-        if self._fields[MultiLicenseSelection.NAME].data:
+        if self._fields[MultiLicenseSelection.NAME].has_data:
             row = self._fields[MultiLicenseSelection.NAME].process(package, version, row)
         
         row.extend(len(OPTIONAL_COLUMNS) * [''])
-        if self._fields[AdditionalInfo.NAME].data:
+        if self._fields[AdditionalInfo.NAME].has_data:
             row = self._fields[AdditionalInfo.NAME].process(package, version, row)
         
         return row

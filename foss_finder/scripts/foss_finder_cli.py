@@ -143,9 +143,18 @@ def main():
         logger.critical('Bad credentials')
         sys.exit()
 
-    tracker = FossTracker()
-
     logger.info('--------------')
+
+    try:
+        with open(config.GLOBAL_USER_DEFINED_INFORMATION_NAME) as f:
+            global_user_defined_information = json.load(f)
+        logger.info(f'Found {config.GLOBAL_USER_DEFINED_INFORMATION_NAME} (global user-defined information file)')
+        logger.debug(f'Found the following data: {global_user_defined_information}')
+    except FileNotFoundError:
+        global_user_defined_information = {}
+        logger.debug(f'No global user-defined information file was found')
+
+    tracker = FossTracker(global_user_defined_information=global_user_defined_information)
 
     if args.project:
         repo = organization.get_repo(args.project)

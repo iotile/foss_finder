@@ -1,4 +1,5 @@
 from foss_finder.utils.csv import write_new_row
+from foss_finder.utils.user_defined_info import UserDefinedInformation
 
 from .project import Project
 
@@ -8,7 +9,10 @@ class FossTracker():
     Tracks a set of projects along with their dependencies.
     """
 
-    def __init__(self):
+    def __init__(self, global_user_defined_information={}):
+        # validate global data only one time
+        UserDefinedInformation.validate_data(global_user_defined_information)
+        self.global_user_defined_information = global_user_defined_information
         # Maps the name of a project to a Project object
         self.processed_projects = {}
     
@@ -27,7 +31,7 @@ class FossTracker():
 
     def add_project(self, project_name):
         if project_name not in self.processed_projects:
-            self.processed_projects[project_name] = Project(project_name)
+            self.processed_projects[project_name] = Project(project_name, self.global_user_defined_information)
     
     def add_user_defined_information_to_project(self, project_name, data):
         self.processed_projects[project_name].set_user_defined_information(data)

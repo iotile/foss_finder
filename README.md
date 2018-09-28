@@ -61,7 +61,7 @@ The `INI_PATH` value defines the path of the INI configuration file, which is th
 By default, this INI configuration file is named *.foss_finder*. It contains five sections and several keys.  
 When using the CLI, make sure you have the INI configuration file in the same directory as the one where you run the commands. The next paragraphs will explain what are the sections of the INI configurastion file.
 
-**_NB:_** `/config/config.py` also defines other values that you can't change in the INI configuration file, such as `DEFAULT_COLUMNS`, `USER_DEFINED_INFORMATION_NAME`, and `USER_DEFINED_INFORMATION_FIELDS`. There is no reason for a user to change these values.
+**_NB:_** `/config/config.py` also defines other values that you can't change in the INI configuration file, such as `DEFAULT_COLUMNS`, `USER_DEFINED_INFORMATION_NAME`, `GLOBAL_USER_DEFINED_INFORMATION_NAME`, and `USER_DEFINED_INFORMATION_FIELDS`. There is no reason for a user to change these values.
 
 #### User defined information
 
@@ -102,10 +102,9 @@ That's why foss_finder gives the possibility to modify the csv files that are ge
 
 ### How to add user defined information
 
-You can modify the csv file of a repository by adding a configuration file at the root of this repository. By default, this file should be named _.foss.json_. If this file is found, the foss_finder script parses it and uses the information to modify the output csv file of the repository.
+You can modify the csv file of a repository by adding a configuration file at the root of the repository. By default, this file should be named _.foss.json_. If this file is found, the foss_finder script parses it and uses the information to modify the output csv file of the repository.
 
 Here is an example of what you can put in this file:
-
 
 ```
 {
@@ -158,6 +157,12 @@ Let's explain what happens field by field:
 4) `"multi-license-selection"`: for package _Foo2_ version _3.2.1_, choose the _Apache License 2.0_ from the multi-license. When foss_finder parses this field, it checks that the license of the package is actually a multi-license and that the license provided in the `"multi-license-selection"` field is part of this multi-license. (You can tell that both these requirements are satisfied because _Foo2_ version _3.2.1_ was actually added through `"add-packages"`.)
 
 For each field, every object in the array must have an `"owner"` (the person who added the object to the configuration file). Besides, it must also have a `"package"` field with the name of the pacakge. The `"version"` field is optional: if it's not specified, then foss_finder assumes the modification is relevant for all versions of the package.
+
+### Global user defined information
+
+There is a feature to avoid writing the same configuration in every repository of an organization. Just like you can add _.foss.json_ at the root of a repository, you can add _.foss.global.json_ in the directory where you launch the script (same directory as the INI configuration file _.foss_finder_). Its fields and constraints are exactly the same as the ones of _.foss.json_, except that they are global. It's the same as adding these fields to _.foss.json_ for every repository that is scanned by foss_finder.
+
+It is possible to have conflicts between _.foss.global.json_ and a given _.foss.json_. In that event, priority is given to _.foss.json_. Indeed, for each package that is added or overwitten, foss_finder first looks at _.foss.json_ and if it's not found there, then it looks at _.global.json_.
 
 ## Development
 

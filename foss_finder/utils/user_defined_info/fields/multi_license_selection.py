@@ -14,8 +14,8 @@ class MultiLicenseSelection(UserDefinedInformationField):
     """
     NAME = MULTI_LICENSE_SELECTION_NAME
 
-    def __init__(self, data, *args, **kwargs):
-        super(MultiLicenseSelection, self).__init__(data, *args, **kwargs)
+    def __init__(self, local_data=[], global_data=[], *args, **kwargs):
+        super(MultiLicenseSelection, self).__init__(local_data=local_data, global_data=global_data, *args, **kwargs)
         self._package_info_useless_keys = (OWNER, REASON)
 
     def _validate_multi_license_selection(self, package_info, multi_license):
