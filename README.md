@@ -1,5 +1,8 @@
 # FOSS Finder
 
+[![PyPI](https://img.shields.io/pypi/v/foss_finder.svg?style=plastic)](https://pypi.python.org/pypi/foss-finder) [![PyPI](https://img.shields.io/pypi/pyversions/foss_finder.svg?style=plastic)](https://github.com/iotile/iotile_analytics)
+
+
 A Python script to look for the dependencies used in the repositories of a GitHub organization.
 
 ## Installation
