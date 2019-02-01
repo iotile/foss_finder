@@ -35,8 +35,8 @@ class UserDefinedInformation():
         # we don't want to validate it several times as it is global
 
         for key, field in self._fields.items():
-            field.local_data = local_data.get(key)
-            field.global_data = global_data.get(key)
+            field.local_data = local_data.get(key, [])
+            field.global_data = global_data.get(key, [])
 
     @classmethod
     def validate_data(cls, data):

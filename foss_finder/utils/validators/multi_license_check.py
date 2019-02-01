@@ -25,14 +25,14 @@ class MultiLicenseCheck(Check):
     DESCRIPTION = 'Checks that there is only one chosen license from a multi-license'
 
     def __init__(self, *args, **kwargs):
-        default_colummns = foss_finder.config.config.DEFAULT_COLUMNS
-        if LICENSE in default_colummns and PACKAGE in default_colummns and VERSION in default_colummns:
-            self.license_index = default_colummns.index(LICENSE)
-            self.name_index = default_colummns.index(PACKAGE)
-            self.version_index = default_colummns.index(VERSION)
+        default_columns = foss_finder.config.config.DEFAULT_COLUMNS
+        if LICENSE in default_columns and PACKAGE in default_columns and VERSION in default_columns:
+            self.license_index = default_columns.index(LICENSE)
+            self.name_index = default_columns.index(PACKAGE)
+            self.version_index = default_columns.index(VERSION)
         else:
             raise ValueError('Package, version, and license must be in the default columns.')
-        self.multi_license_selection_index = len(default_colummns)
+        self.multi_license_selection_index = len(default_columns)
 
     def check(self, package_info):
         package_license = package_info[self.license_index]

@@ -24,18 +24,26 @@ class GPLCheck(Check):
     DESCRIPTION = 'Checks that the license is not a GPL-like license'
 
     def __init__(self, *args, **kwargs):
-        default_colummns = foss_finder.config.config.DEFAULT_COLUMNS
-        if LICENSE in default_colummns and PACKAGE in default_colummns and VERSION in default_colummns:
-            self.license_index = default_colummns.index(LICENSE)
-            self.name_index = default_colummns.index(PACKAGE)
-            self.version_index = default_colummns.index(VERSION)
+        default_columns = foss_finder.config.config.DEFAULT_COLUMNS
+        if LICENSE in default_columns and PACKAGE in default_columns and VERSION in default_columns:
+            self.license_index = default_columns.index(LICENSE)
+            self.name_index = default_columns.index(PACKAGE)
+            self.version_index = default_columns.index(VERSION)
         else:
             raise ValueError('Package, version, and license must be in the default columns.')
+        self.multi_license_selection_index = len(default_columns)
 
     def check(self, package_info):
         package_license = package_info[self.license_index]
         package_name = package_info[self.name_index]
         package_version = package_info[self.version_index]
+        package_multi_license_selection = package_info[self.multi_license_selection_index]
 
         if 'gpl' in package_license.lower():
+            # check if it's a multi-license
+            if ' or ' in package_license.lower() or ' and ' in package_license.lower():
+                # check if the chosen multi-license isn't GPL
+                if package_multi_license_selection and 'gpl' not in package_multi_license_selection:
+                    # in this case, the check passes
+                    return
             raise GPLCheckError(package_name, package_version, package_license)
