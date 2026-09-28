@@ -45,6 +45,14 @@ foss-finder-cli -u <your_username> <name_of_your_organization>
 
 **_NB:_** Don't forget to have the INI configuration file in the same directory as the one where you run the command! (See below: _Configuration_.)
 
+You can also scan a project stored on your machine, wherever its code is hosted (GitLab, Bitbucket, a plain folder...). No GitHub credentials are needed in this case:
+
+```shell
+foss-finder-cli --local <path_of_your_project>
+```
+
+The report is named after the folder of the project. Version control folders (such as _.git_), _node_modules_ folders and Python virtual environments are not scanned since they don't contain the project's own dependency files.
+
 ### Other options
 
 The above commands run the script on all the repositories of the organization. If you want to process a single repository, you can do so by adding `--project <name_of_your_repository>`.
