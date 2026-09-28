@@ -11,6 +11,7 @@ from github import Github, GithubException
 
 from ..utils.parsers import NpmPackageParser, PyPiRequirementParser
 from ..utils.tracker import FossTracker
+from ..utils.local import LocalRepository
 from ..config import strings, config
 
 logger = logging.getLogger(__name__)
@@ -88,17 +89,37 @@ def process_project(repo, tracker, outdir, npm_sections, depth, python_files):
 
 def build_parser():
     parser = argparse.ArgumentParser(description=__doc__)
-    group = parser.add_mutually_exclusive_group(required=True)
+    group = parser.add_mutually_exclusive_group()
     group.add_argument('-t', '--token', dest='token', type=str, help='GitHub token')
     group.add_argument('-u', '--username', dest='username', type=str, help='GitHub username')
+    group.add_argument('--local', dest='local', type=str, metavar='PATH',
+                       help='process a local project instead of GitHub repositories (no GitHub credentials needed)')
     parser.add_argument('-o', '--outdir', dest='outdir', type=str, default='out', help='output directory')
     parser.add_argument('--depth', dest='depth', type=int, default=0, help='depth for NPM and Python dependencies')
     parser.add_argument('--project', type=str, required=False, help='process a specific repository')
     parser.add_argument('--dev', action='store_true', help='activate lookup for dev dependencies')
     parser.add_argument('--debug', action='store_true', help='debug mode')
-    parser.add_argument('org', metavar='org', type=str, help='GitHub organization')
+    parser.add_argument('org', metavar='org', type=str, nargs='?', help='GitHub organization (not used with --local)')
 
     return parser
+
+
+def parse_args(argv=None):
+    parser = build_parser()
+    args = parser.parse_args(argv)
+
+    if args.local:
+        if args.org or args.project:
+            parser.error('argument --local: not allowed with a GitHub organization or --project')
+        if not os.path.isdir(args.local):
+            parser.error(f'argument --local: {args.local} is not a directory')
+    else:
+        if not (args.token or args.username):
+            parser.error('one of the arguments -t/--token -u/--username --local is required')
+        if not args.org:
+            parser.error('the following arguments are required: org')
+
+    return args
 
 
 def main():
@@ -108,10 +129,7 @@ def main():
         format='[%(asctime)-15s] %(levelname)-6s %(message)s',
         datefmt='%d/%b/%Y %H:%M:%S',
     )
-    parser = build_parser()
-    args = parser.parse_args()
-
-    args = parser.parse_args()
+    args = parse_args()
 
     if args.debug:
         logger.setLevel(logging.DEBUG)
@@ -131,7 +149,9 @@ def main():
         python_files = list(set(python_files))
 
     try:
-        if args.token:
+        if args.local:
+            organization = None
+        elif args.token:
             g = Github(args.token)
             organization = g.get_organization(args.org)
         elif args.username:
@@ -158,7 +178,14 @@ def main():
     tracker = FossTracker(global_user_defined_information=global_user_defined_information)
     logger.debug(f'The following validators are used: {tracker.validators}')
 
-    if args.project:
+    if args.local:
+        repo = LocalRepository(args.local)
+        logger.info(f'Starting process for {repo.name} (local project: {repo.root})')
+        process_project(repo, tracker, args.outdir, npm_sections, args.depth, python_files)
+        logger.info(f'End of process for {repo.name}')
+        for line in tracker.report_project_summary(repo.name):
+            logger.info(line)
+    elif args.project:
         repo = organization.get_repo(args.project)
         logger.info(f'Starting process for {repo.name}')
         process_project(repo, tracker, args.outdir, npm_sections, args.depth, python_files)
